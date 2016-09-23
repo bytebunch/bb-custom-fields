@@ -11,27 +11,8 @@ class CreateMetaBoxesBBCF extends BBCustomFields{
   public function __construct(){
 
     $this->user_created_metaboxes = SerializeStringToArray(get_option($this->prefix('user_created_metaboxes')));
-    $meta_taxonomy_list = array();
-    $args = array('public' => true);
-    $taxonomies = get_taxonomies($args);
-    if(count($this->user_created_metaboxes) >= 1){
-      foreach ($this->user_created_metaboxes as $key => $value) {
-        if(isset($value['metabox_location']) && is_array($value['metabox_location']) && count($value['metabox_location']) >= 1){
-          if(in_array("user_profile", $value['metabox_location']))
-            $this->user_profile_metaboxes[$key] = $value;
-          foreach ($taxonomies as $taxonomy) {
-            if($taxonomy == 'post_format')
-              continue;
-            if(in_array($taxonomy, $value['metabox_location'])){
-              $this->taxonomies_metaboxes[] = array($taxonomy, $value);
-              $meta_taxonomy_list[$taxonomy] = $taxonomy;
-            }
-          }
-        }
-      }
-    }
 
-  //  add_action( 'admin_init', array($this,'admin_init') );
+    add_action( 'admin_init', array($this,'admin_init') );
 
 
     add_action( 'admin_menu', array($this,'admin_menu'));
@@ -46,6 +27,39 @@ class CreateMetaBoxesBBCF extends BBCustomFields{
 		add_action( 'show_user_profile', array($this, 'edit_user_profile'));
 		add_action( 'profile_update', array($this, 'update_user_profile'));
 
+  }
+
+  public function admin_init(){
+
+    $meta_taxonomy_list = array();
+    $args = array('public' => true);
+    $post_types = get_post_types( $args, 'names' );
+    $taxonomies = get_taxonomies($args);
+    if(count($this->user_created_metaboxes) >= 1){
+      foreach ($this->user_created_metaboxes as $key => $value) {
+        if(isset($value['metabox_location']) && is_array($value['metabox_location']) && count($value['metabox_location']) >= 1){
+          if(in_array("user_profile", $value['metabox_location']))
+            $this->user_profile_metaboxes[$key] = $value;
+          if(in_array("comment", $value['metabox_location']))
+            $this->post_types_metaboxes[] = array("comment", $value);
+          foreach($post_types as $post_type){
+            if($post_type == 'attachment')
+              continue;
+            if(in_array($post_type, $value['metabox_location']))
+              $this->post_types_metaboxes[] = array($post_type, $value);
+          }
+          foreach ($taxonomies as $taxonomy) {
+            if($taxonomy == 'post_format')
+              continue;
+            if(in_array($taxonomy, $value['metabox_location'])){
+              $this->taxonomies_metaboxes[] = array($taxonomy, $value);
+              $meta_taxonomy_list[$taxonomy] = $taxonomy;
+            }
+          }
+        }
+      }
+    }
+
     if(count($meta_taxonomy_list) >= 1){
       foreach($meta_taxonomy_list as $value){
         add_action( $value.'_add_form_fields',array($this,'taxonomy_add_new_meta_field'),10,2);
@@ -55,14 +69,7 @@ class CreateMetaBoxesBBCF extends BBCustomFields{
       }
     }
 
-    /*if(count($this->taxonomies_metaboxes) >= 1){
-      foreach($this->taxonomies_metaboxes as $value){
-        add_action( $value[0].'_add_form_fields',array($this,'taxonomy_add_new_meta_field'),10,2);
-        add_action( $value[0].'_edit_form_fields',array($this,'taxonomy_edit_meta_field'),10,2);
-        add_action( 'edited_'.$value[0], array($this,'save_taxonomy_meta_field'), 10, 2 );
-        add_action( 'create_'.$value[0], array($this,'save_taxonomy_meta_field'), 10, 2 );
-      }
-    }*/
+
   }
 
   /******************************************/
@@ -107,22 +114,15 @@ class CreateMetaBoxesBBCF extends BBCustomFields{
   /******************************************/
   public function add_meta_boxes() {
 
-    $args = array('public' => true);
-    $post_types = get_post_types( $args, 'names' );
+    /*$args = array('public' => true);
+
     if(count($this->user_created_metaboxes) >= 1){
       foreach ($this->user_created_metaboxes as $key => $value) {
         if(isset($value['metabox_location']) && is_array($value['metabox_location']) && count($value['metabox_location']) >= 1){
-          if(in_array("comment", $value['metabox_location']))
-            $this->post_types_metaboxes[] = array("comment", $value);
-          foreach($post_types as $post_type){
-            if($post_type == 'attachment')
-              continue;
-            if(in_array($post_type, $value['metabox_location']))
-              $this->post_types_metaboxes[] = array($post_type, $value);
-          }
+
         }
       }
-    }
+    }*/
 
 
 
@@ -231,6 +231,7 @@ class CreateMetaBoxesBBCF extends BBCustomFields{
   /***** taxonomy_add_new_meta_field function start from here *********/
   /******************************************/
   public function taxonomy_add_new_meta_field($tag){
+
     //db($tag);exit();
     if(count($this->taxonomies_metaboxes) >= 1){
       foreach ($this->taxonomies_metaboxes as $value) {
