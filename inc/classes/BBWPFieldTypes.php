@@ -234,7 +234,7 @@ class BBWPFieldTypes{
   public function DisplayOptions(){
     $existing_values = SerializeStringToArray(get_option($this->prefix));
     if(isset($existing_values) && $existing_values && count($existing_values) >= 1){
-
+      //db($existing_values);
       echo '<input type="hidden" name="'.$this->prefix('update_options').'" value="'.$this->prefix('update_options').'" />';
       echo $this->displaytype['wrapper_open'];
 

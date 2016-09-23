@@ -13,21 +13,12 @@ class CreateMetaBoxesBBCF extends BBCustomFields{
     $this->user_created_metaboxes = SerializeStringToArray(get_option($this->prefix('user_created_metaboxes')));
     $meta_taxonomy_list = array();
     $args = array('public' => true);
-    $post_types = get_post_types( $args, 'names' );
     $taxonomies = get_taxonomies($args);
     if(count($this->user_created_metaboxes) >= 1){
       foreach ($this->user_created_metaboxes as $key => $value) {
         if(isset($value['metabox_location']) && is_array($value['metabox_location']) && count($value['metabox_location']) >= 1){
           if(in_array("user_profile", $value['metabox_location']))
             $this->user_profile_metaboxes[$key] = $value;
-          if(in_array("comment", $value['metabox_location']))
-            $this->post_types_metaboxes[] = array("comment", $value);
-          foreach($post_types as $post_type){
-            if($post_type == 'attachment')
-              continue;
-            if(in_array($post_type, $value['metabox_location']))
-              $this->post_types_metaboxes[] = array($post_type, $value);
-          }
           foreach ($taxonomies as $taxonomy) {
             if($taxonomy == 'post_format')
               continue;
@@ -39,6 +30,9 @@ class CreateMetaBoxesBBCF extends BBCustomFields{
         }
       }
     }
+
+  //  add_action( 'admin_init', array($this,'admin_init') );
+
 
     add_action( 'admin_menu', array($this,'admin_menu'));
 
@@ -112,6 +106,26 @@ class CreateMetaBoxesBBCF extends BBCustomFields{
   /***** add_meta_box function start from here *********/
   /******************************************/
   public function add_meta_boxes() {
+
+    $args = array('public' => true);
+    $post_types = get_post_types( $args, 'names' );
+    if(count($this->user_created_metaboxes) >= 1){
+      foreach ($this->user_created_metaboxes as $key => $value) {
+        if(isset($value['metabox_location']) && is_array($value['metabox_location']) && count($value['metabox_location']) >= 1){
+          if(in_array("comment", $value['metabox_location']))
+            $this->post_types_metaboxes[] = array("comment", $value);
+          foreach($post_types as $post_type){
+            if($post_type == 'attachment')
+              continue;
+            if(in_array($post_type, $value['metabox_location']))
+              $this->post_types_metaboxes[] = array($post_type, $value);
+          }
+        }
+      }
+    }
+
+
+
     if(count($this->post_types_metaboxes) >= 1){
       foreach($this->post_types_metaboxes as $value){
         $context = 'normal';
