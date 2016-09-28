@@ -1,6 +1,6 @@
 <?php
 
-class BBWP_CF_PageSettings extends BBCustomFields{
+class BBWP_CF_PageSettings extends BBWP_CustomFields{
 
   public function __construct(){
     add_action('init', array($this, 'input_handle'));
