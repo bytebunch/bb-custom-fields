@@ -1,6 +1,6 @@
 <?php
 
-class PageSettingsBBCF extends BBCustomFields{
+class BBWP_CF_PageSettings extends BBCustomFields{
 
   public function __construct(){
     add_action('init', array($this, 'input_handle'));
@@ -11,7 +11,7 @@ class PageSettingsBBCF extends BBCustomFields{
   /***** page_bboptions_admin_menu function start from here *********/
   /******************************************/
   public function admin_menu(){
-    add_options_page('BB Custom Fields', 'BB Custom Fields', 'manage_options', $this->prefix, array($this,'add_submenu_page'));
+    add_options_page('BBWP Custom Fields', 'BBWP Custom Fields', 'manage_options', $this->prefix, array($this,'add_submenu_page'));
   }
 
   /******************************************/
@@ -43,7 +43,7 @@ class PageSettingsBBCF extends BBCustomFields{
       $metaboxes_select_list .= '</select>';
     }
 
-    echo '<h2> BB Custom Fields </h2>';
+    echo '<h2> BBWP Custom Fields </h2>';
 
     if(isset($_GET['action']) && $_GET['action'] == 'edit' && isset($_GET['meta_key']) && $_GET['meta_key']){
       $BBWPFieldTypes = new BBWPFieldTypes($this->prefix($current_selected_metabox));

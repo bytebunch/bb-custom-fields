@@ -1,5 +1,5 @@
 <?php
-class CreateMetaBoxesBBCF extends BBCustomFields{
+class BBWP_CF_CreateMetaBoxes extends BBCustomFields{
 
   private $user_created_pages = array();
   private $user_created_metaboxes = array();

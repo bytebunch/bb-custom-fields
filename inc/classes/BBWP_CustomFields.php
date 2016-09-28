@@ -1,17 +1,17 @@
 <?php
 
-class BBCustomFields{
+class BBWP_CustomFields{
 
-  public $prefix = 'bbcustomfields';
+  public $prefix = 'bbwpcustomfields';
   static $bbcf = array();
   //public $url = BBWPMETABOXES_URL;
 
   public function __construct(){
     self::$bbcf = SerializeStringToArray(get_option($this->prefix.'_options'));
     add_action( 'admin_enqueue_scripts', array($this, 'wp_admin_style_scripts') );
-    add_filter( 'plugin_action_links_'.BBCUSTOMFIELDS_PLUGIN_FILE, array($this, 'plugin_action_links') );
-    register_activation_hook(BBCUSTOMFIELDS_PLUGIN_FILE, array($this, 'PluginActivation'));
-    //register_deactivation_hook(BBCUSTOMFIELDS_PLUGIN_FILE, array($this, 'PluginDeactivation'));
+    add_filter( 'plugin_action_links_'.BBWP_CF_PLUGIN_FILE, array($this, 'plugin_action_links') );
+    register_activation_hook(BBWP_CF_PLUGIN_FILE, array($this, 'PluginActivation'));
+    //register_deactivation_hook(BBWP_CF_PLUGIN_FILE, array($this, 'PluginDeactivation'));
   }// construct function end here
 
   public function prefix($string = '', $underscore = "_"){
@@ -64,10 +64,10 @@ class BBCustomFields{
       wp_register_style( 'jquery-ui', $url, array(), $ui->ver);
       wp_enqueue_style('jquery-ui');
 
-      wp_register_style( $this->prefix.'_wp_admin_css', BBCUSTOMFIELDS_URL . '/css/style.css', array('wp-color-picker'), '1.0.0' );
+      wp_register_style( $this->prefix.'_wp_admin_css', BBWP_CF_URL . '/css/style.css', array('wp-color-picker'), '1.0.0' );
       wp_enqueue_style($this->prefix.'_wp_admin_css');
 
-      wp_register_script( $this->prefix.'_wp_admin_script', BBCUSTOMFIELDS_URL . '/js/script.js', array('jquery', 'jquery-ui-sortable' ,'jquery-ui-datepicker', 'wp-color-picker'), '1.0.0' );
+      wp_register_script( $this->prefix.'_wp_admin_script', BBWP_CF_URL . '/js/script.js', array('jquery', 'jquery-ui-sortable' ,'jquery-ui-datepicker', 'wp-color-picker'), '1.0.0' );
       wp_enqueue_script( $this->prefix.'_wp_admin_script' );
 
       //$js_variables = array('prefix' => $this->prefix."_");
