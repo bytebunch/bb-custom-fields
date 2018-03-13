@@ -24,6 +24,7 @@ class BBWP_CF_PageSettings extends BBWP_CustomFields{
     $metaboxes_select_list = false;
     $user_created_metaboxes = SerializeStringToArray(get_option($this->prefix('user_created_metaboxes')));
     $user_created_pages = SerializeStringToArray(get_option($this->prefix('user_created_pages')));
+    $user_created_post_types = SerializeStringToArray(get_option($this->prefix('user_created_post_types')));
     $current_selected_metabox = $this->get_bbcf_option("selected_metabox");
 
     if(isset($user_created_metaboxes) && is_array($user_created_metaboxes) && count($user_created_metaboxes) >= 1){
@@ -63,6 +64,11 @@ class BBWP_CF_PageSettings extends BBWP_CustomFields{
       $this->CreatePageForm($user_created_pages, $_GET['page_slug']);
       return;
     }
+    elseif(isset($_GET['action']) && $_GET['action'] == 'edit' && isset($_GET['name']) && $_GET['name']){
+      BBWPUpdateErrorMessage();
+      $this->CreatePostTypeForm($user_created_post_types, $_GET['name']);
+      return;
+    }
 
     BBWPUpdateErrorMessage();
     ?>
@@ -72,6 +78,7 @@ class BBWP_CF_PageSettings extends BBWP_CustomFields{
       }?>
       <a href="#add-new-metabox" class="nav-tab">Meta Boxes</a>
       <a href="#add-new-option-page" class="nav-tab">Option Pages</a>
+      <a href="#add-new-custom-post-types" class="nav-tab">Custom Post Types</a>
     </h2>
 
     <div class="bbwp_tab_nav_content" id="add-new-metabox" style="display:none;">
@@ -142,7 +149,25 @@ class BBWP_CF_PageSettings extends BBWP_CustomFields{
       }
       ?>
     </div>
-
+    <div class="bbwp_tab_nav_content" id="add-new-custom-post-types" style="display:none;">
+      <?php
+      $this->CreatePostTypeForm($user_created_post_types);
+      if($user_created_post_types && is_array($user_created_post_types) && count($user_created_post_types) >= 1){
+        echo '<form method="post" action=""><h3>Existing Post Types</h3>';
+        $tableColumns = array("name" => "Post Type Slug/Name", "label" => "Plural Label");
+        $BBWPListTable = new BBWPListTable();
+        $BBWPListTable->get_columns($tableColumns);
+        $BBWPListTable->bulk_actions = array("delete" => "Delete Selected");
+        $BBWPListTable->get_sortable_columns(array("name" => "name"));
+        $BBWPListTable->actions = array('name' => array('delete', 'edit'));
+        $BBWPListTable->prepare_items($user_created_post_types);
+        $BBWPListTable->display();
+        echo '<input type="hidden" name="sort_fields" value="'.$this->prefix('user_created_post_types').'" />';
+        submit_button('Save Changes', 'primary alignright');
+        echo '</form>';
+      }
+      ?>
+    </div>
 
     <?php echo '</div><!-- main wrap div end here -->';
   }
@@ -295,6 +320,52 @@ class BBWP_CF_PageSettings extends BBWP_CustomFields{
   }
 
   /******************************************/
+  /***** CreatePostTypeForm function start from here *********/
+  /******************************************/
+  private function CreatePostTypeForm($user_created_post_types = array(), $edit_post_type = false){
+    $edit_post_type_values = array();
+    echo '<form method="post" action="">';
+    if($edit_post_type && is_array($user_created_post_types) && count($user_created_post_types) >= 1 && array_key_exists($edit_post_type, $user_created_post_types)){
+      $edit_post_type_values = $user_created_post_types[$edit_post_type];
+      echo '<input type="hidden" name="update_created_post_type" value="'.$edit_post_type.'" />';
+    }
+      ?>
+      <input type="hidden" name="create_new_post_type" value="<?php echo $this->prefix('create_new_post_type'); ?>" />
+      <h3>Basic Settings</h3>
+      <table class="form-table">
+        <tr>
+          <th scope="row"><label for="name">Post Type Slug: <span class="require_star">*</span></label></th>
+          <td>
+            <?php $selected_value = ''; if(isset($edit_post_type_values['name'])){ $selected_value = $edit_post_type_values['name']; } ?>
+            <input type="text" name="user_created_post_type[name]" id="name" class="regular-text" required="required" value="<?php echo $selected_value; ?>" />
+            <br /><span class="bbwpcf-field-description">The post type name/slug. Used for various queries for post type content.</span>
+            <p>Slugs should only contain alphanumeric, latin characters. Underscores should be used in place of spaces. Set "Custom Rewrite Slug" field to make slug use dashes for URLs.</p>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row"><label for="label">Plural Label <span class="require_star">*</span></label></th>
+          <td>
+            <?php $selected_value = ''; if(isset($edit_post_type_values['label'])){ $selected_value = $edit_post_type_values['label']; } ?>
+            <input type="text" name="user_created_post_type[label]" id="name" class="regular-text" required="required" value="<?php echo $selected_value; ?>" />
+            <br /><span class="bbwpcf-field-description">Used for the post type admin menu item.</span>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row"><label for="label">Singular Label <span class="require_star">*</span></label></th>
+          <td>
+            <?php $selected_value = ''; if(isset($edit_post_type_values['singular_label'])){ $selected_value = $edit_post_type_values['singular_label']; } ?>
+            <input type="text" name="user_created_post_type[singular_label]" id="name" class="regular-text" required="required" value="<?php echo $selected_value; ?>" />
+            <br /><span class="bbwpcf-field-description">Used when a singular label is needed.</span>
+          </td>
+        </tr>
+      </table>
+
+    <?php
+    submit_button('Save Changes');
+    echo '</form>';
+  }
+
+  /******************************************/
   /***** input_handle function start from here *********/
   /******************************************/
   private function DeleteMetaBoxes($meta_key, $db_key){
@@ -422,7 +493,53 @@ class BBWP_CF_PageSettings extends BBWP_CustomFields{
           }
         }
       }
-      /* create new option page form input start */
+      /* create new option page form input end */
+
+      /* create new post type form input start */
+      if(isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['name']) && $_GET['name'])
+        BBWPFieldTypes::DeleteFields($_GET['name'], $this->prefix("user_created_post_types"));
+
+      if(isset($_POST['sort_fields']) && $_POST['sort_fields'] === $this->prefix('user_created_post_types')){
+        if(isset($_POST['bulk_action']) && $_POST['bulk_action'] === 'delete' && isset($_POST['fields']) && is_array($_POST['fields']) && count($_POST['fields']) >= 1)
+        {
+          BBWPFieldTypes::DeleteFields($_POST['fields'], $this->prefix("user_created_post_types"));
+        }
+        elseif(isset($_POST['sort_field']) && is_array($_POST['sort_field']) && count($_POST['sort_field']) >= 1)
+          BBWPFieldTypes::SortFields($_POST['sort_field'], $this->prefix("user_created_post_types"));
+      }
+      if(isset($_POST['create_new_post_type']) && $_POST['create_new_post_type'] === $this->prefix('create_new_post_type')){
+        if(isset($_POST['user_created_post_type']) && $_POST['user_created_post_type'] && is_array($_POST['user_created_post_type']) && count($_POST['user_created_post_type']) >= 1 && isset($_POST['user_created_post_type']['name']) && $_POST['user_created_post_type']['name']){
+          $update = false;
+          $update_message = 'Your setting have been updated.';
+          $existing_values = SerializeStringToArray(get_option($this->prefix('user_created_post_types')));
+          $new_values = array();
+          $array_index = '';
+          foreach($_POST['user_created_post_type'] as $key=>$value){
+            if(isset($_POST['user_created_post_type'][$key]) && $_POST['user_created_post_type'][$key]){
+              if($key == 'name'){
+                $new_values[$key] = BBWPSanitization::Textfield(strtolower($value));
+                $array_index = $new_values['name'];
+              }
+              else
+                $new_values[$key] = BBWPSanitization::Textfield($value);
+            }
+          }
+          if(isset($_POST['update_created_post_type']) && array_key_exists($_POST['update_created_post_type'], $existing_values)){
+            $array_index = $_POST['update_created_post_type'];
+            $update = true;
+            $update_message = '<p>Your setting have been updated.</p><p><a href="?page='.sanitize_key($_GET['page']).'">← Back to Main Page</a></p>';
+          }
+          if($update == false && array_key_exists($array_index, $existing_values)){
+            update_option("bbwp_error_message", 'There was some problem. Please try again with different page name.');
+          }elseif($new_values && is_array($new_values) && count($new_values) >= 1 && $array_index ){
+            $existing_values[$array_index] = $new_values;
+            update_option($this->prefix('user_created_post_types'), ArrayToSerializeString($existing_values));
+            update_option("bbwp_update_message", $update_message);
+          }
+
+        }
+      }
+      /* create new post type form input end */
 
       if(isset($_POST[$this->prefix("current_selected_metabox")]) && array_key_exists($_POST[$this->prefix("current_selected_metabox")], SerializeStringToArray(get_option($this->prefix('user_created_metaboxes'))))){
         $this->set_bbcf_option("selected_metabox", $_POST[$this->prefix("current_selected_metabox")]);

@@ -102,5 +102,7 @@ a.bb_dismiss_icon::before{
 	top:-9px;
 	right:-9px;
 }
-
+.bbwpcf-field-description{
+	font-style: italic;
+}
 /* field type css end here */

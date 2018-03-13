@@ -70,6 +70,7 @@ class BBWP_CustomFields{
       wp_register_script( $this->prefix.'_wp_admin_script', BBWP_CF_URL . '/js/script.js', array('jquery', 'jquery-ui-sortable' ,'jquery-ui-datepicker', 'wp-color-picker'), '1.0.0' );
       wp_enqueue_script( $this->prefix.'_wp_admin_script' );
 
+
       //$js_variables = array('prefix' => $this->prefix."_");
       //wp_localize_script( $this->prefix.'_wp_admin_script', $this->prefix, $js_variables );
     //}

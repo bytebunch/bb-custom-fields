@@ -386,7 +386,7 @@ class BBWPFieldTypes{
             }
             else{
                 if($value['field_type'] == 'textarea' || $value['field_type'] == 'editor'){
-                  $dbvalue = BBWPSanitization::Textarea($_POST[$value['meta_key']]); }
+                  $dbvalue = wptexturize(wpautop(BBWPSanitization::Textarea($_POST[$value['meta_key']]))); }
                 else{
                   $dbvalue = BBWPSanitization::Textfield($_POST[$value['meta_key']]); }
             }

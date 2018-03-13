@@ -10,6 +10,10 @@ Text Domain: bbwpcustomfields
 Domain Path: /languages/
 */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 //define('BBWPOP','bbwpop');
 define('BBWP_CF_URL', plugin_dir_url(__FILE__));
 define('BBWP_CF_ABS', plugin_dir_path( __FILE__ ));
@@ -44,4 +48,9 @@ if(is_admin_panel()){
 		$BBWP_CF_CreateMetaBoxes = new BBWP_CF_CreateMetaBoxes();
 	}
 
+}
+
+if(!class_exists('BBWP_CF_CustomPostType')){
+	include_once BBWP_CF_ABS.'inc/classes/BBWP_CF_CustomPostType.php';
+	$BBWP_CF_CustomPostType = new BBWP_CF_CustomPostType();
 }

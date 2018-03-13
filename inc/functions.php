@@ -19,7 +19,7 @@ if(!function_exists("is_admin_panel")){
 /******************************************/
 /***** is_admin_panel **********/
 /******************************************/
-if(is_admin_panel()){
+//if(is_admin_panel()){
 
   /******************************************/
   /***** Debug functions start from here **********/
@@ -94,4 +94,4 @@ if(is_admin_panel()){
 
 
 
-}
+//}
