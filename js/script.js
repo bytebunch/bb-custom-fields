@@ -56,6 +56,7 @@ function getSessionBB(key){
 	  });
   };
 })( jQuery );
+
 jQuery(document).ready(function($){
    $(".bbwp_nav_wrapper").BBWPTabbedMenu({
 		 divclass: "bbwp_tab_nav_content",
@@ -183,5 +184,16 @@ jQuery(document).ready(function($) {
 		bb_multiple_wp_uploader.open();
 		return false;
 	});
+
+  if($(".bytebunch_admin_page_container").length >= 1){
+    postboxes.save_state = function(){
+        return;
+    };
+    postboxes.save_order = function(){
+        return;
+    };
+    postboxes.add_postbox_toggles();
+  }
+
 
 });

@@ -1,12 +1,13 @@
 .bytebunch_admin_page_container h2{
 	margin:20px 0!important;
+	padding-bottom: 0px!important;
 }
 .bytebunch_admin_page_container h2 a:focus{
 	box-shadow: none;
 }
 .bytebunch_admin_page_container textarea{
 	max-width: 100%;
-	width:25em;
+	width:75%;
 }
 .bytebunch_admin_page_container .form-field textarea{
 	width:95%;
@@ -14,9 +15,23 @@
 .bytebunch_admin_page_container .form-table td, .bytebunch_admin_page_container .form-table th{
 	vertical-align: top;
 }
+.bytebunch_admin_page_container .bbwp_cf_table_ui th p {
+    font-weight: 400;
+    font-size: 12px;
+}
+.bytebunch_admin_page_container .bbwp_cf_table_ui input[type='text']{
+	width: 75%;
+}
 .form-field .bb_checkboxes_container label{
 	display: inline;
 	display: inline-block;
+}
+.bytebunch_admin_page_container .bbwp_cf_table_ui fieldset {
+    border: 1px solid #ccc;
+    display: block;
+    margin-bottom: 30px;
+    padding: 10px;
+    overflow: hidden;
 }
 input.regular-text{
 	max-width: 100%;

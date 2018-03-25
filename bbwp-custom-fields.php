@@ -43,6 +43,16 @@ if(is_admin_panel()){
 		$BBWP_CF_PageSettings = new BBWP_CF_PageSettings();
 	}
 
+	if(!class_exists('BBWP_CF_CPT_Page')){
+		include_once BBWP_CF_ABS.'inc/classes/BBWP_CF_CPT_Page.php';
+		$BBWP_CF_CPT_Page = new BBWP_CF_CPT_Page();
+	}
+
+	if(!class_exists('BBWP_CF_CT_Page')){
+		include_once BBWP_CF_ABS.'inc/classes/BBWP_CF_CT_Page.php';
+		$BBWP_CF_CT_Page = new BBWP_CF_CT_Page();
+	}
+
 	if(!class_exists('BBWP_CF_CreateMetaBoxes')){
 		include_once BBWP_CF_ABS.'inc/classes/BBWP_CF_CreateMetaBoxes.php';
 		$BBWP_CF_CreateMetaBoxes = new BBWP_CF_CreateMetaBoxes();
@@ -54,3 +64,13 @@ if(!class_exists('BBWP_CF_CustomPostType')){
 	include_once BBWP_CF_ABS.'inc/classes/BBWP_CF_CustomPostType.php';
 	$BBWP_CF_CustomPostType = new BBWP_CF_CustomPostType();
 }
+
+if(!class_exists('BBWP_CF_CustomTaxonomy')){
+	include_once BBWP_CF_ABS.'inc/classes/BBWP_CF_CustomTaxonomy.php';
+	$BBWP_CF_CustomTaxonomy = new BBWP_CF_CustomTaxonomy();
+}
+
+/*if(!class_exists('BBWP_CF_CustomTaxonomy')){
+	include_once BBWP_CF_ABS.'inc/classes/BBWP_CF_CustomTaxonomy.php';
+	$BBWP_CF_CustomTaxonomy = new BBWP_CF_CustomTaxonomy();
+}*/

@@ -149,12 +149,14 @@ class BBWP_CF_CreateMetaBoxes extends BBWP_CustomFields{
 
     if($this->user_created_pages && is_array($this->user_created_pages) && count($this->user_created_pages) >= 1){
       echo '<div class="wrap bytebunch_admin_page_container"><div id="icon-tools" class="icon32"></div>';
+      echo '<div id="poststuff">';
+      echo '<div id="postbox-container" class="postbox-container">';
       echo '<form method="post" action="">';
       $current_page = false;
       foreach($this->user_created_pages as $page){
         if(isset($_GET['page']) && $_GET['page'] === $page['page_slug'] && $current_page == false){
           $current_page = $page;
-          echo '<h2>'.$page['page_title'].'</h2>';
+          echo '<h3>'.$page['page_title'].'</h3>';
         }
       }
       if(count($this->user_created_metaboxes) >= 1 && $current_page){
@@ -163,14 +165,23 @@ class BBWP_CF_CreateMetaBoxes extends BBWP_CustomFields{
             $BBWPFieldTypes = new BBWPFieldTypes($this->prefix($key));
             $BBWPFieldTypes->SaveOptions();
             BBWPUpdateErrorMessage();
-            echo '<h3>'.$value['metabox_title'].'</h3>';
+            echo '<div class="meta-box-sortables ui-sortable">
+            <div class="postbox ">
+            <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel </span><span class="toggle-indicator" aria-hidden="true"></span></button>
+            <h3 class="hndle"><span>'.$value['metabox_title'].'</span></h3>
+            <div class="inside">';
             $BBWPFieldTypes->DisplayOptions();
+            echo '</div><!-- inside-->
+            </div><!-- postbox-->
+            </div><!-- ui-sortable-->';
           }
         }
       }
       submit_button();
       echo '</form>';
-      echo '</div>';
+      echo '</div><!-- postbox-container-->';
+      echo '</div><!-- poststuff-->';
+      echo '</div><!-- bytebunch_admin_page_container-->';
     }
   }
 

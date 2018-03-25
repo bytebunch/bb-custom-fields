@@ -31,11 +31,11 @@ class BBWPFieldTypes{
       $existing_values = SerializeStringToArray(get_option($this->prefix));
       if($existing_values && is_array($existing_values) && array_key_exists($edit_field, $existing_values)){
         $input_values = $existing_values[$edit_field];
+        echo '<input type="hidden" name="update_field" value="'.$edit_field.'">';
       }else{
-        echo '<div class="error"><p><strong>We did not find any recrod with given data.</strong></p></div>';
-        return;
+        update_option("bbwp_update_message", "Meta Key has been updated or doesn't exist.");
+        echo '<script>window.location.replace("'.admin_url('admin.php?page='.$_GET['page']).'");</script>';
       }
-      echo '<input type="hidden" name="update_field" value="'.$edit_field.'">';
     }else
       echo '<input type="hidden" name="update_field" value="new">';
     ?>
@@ -170,7 +170,11 @@ class BBWPFieldTypes{
         $type = sanitize_key($_POST['field_type']);
         $existing_values = SerializeStringToArray(get_option($this->prefix));
 
-        if(isset($_POST["update_field"]) && $_POST["update_field"] == "new" && array_key_exists($key, $existing_values)){
+        if(isset($_POST["update_field"]) && $_POST["update_field"] && array_key_exists($_POST["update_field"], $existing_values)){
+          unset($existing_values[$_POST["update_field"]]);
+        }
+
+        if(array_key_exists($key, $existing_values)){
           update_option("bbwp_error_message",  'This meta key is already exist. Please choose new meta key or delete the old one first.');
           return;
         }
@@ -179,8 +183,10 @@ class BBWPFieldTypes{
 
           $update_message = 'Your setting have been updated.';
 
-          if(isset($_GET["action"]) && $_GET["action"] == "edit" && isset($_GET['page']) && isset($_GET['meta_key']))
-            $update_message = '<p>Your setting have been updated.</p><p><a href="?page='.sanitize_key($_GET['page']).'">← Back to Main Page</a></p>';
+          if(isset($_GET["action"]) && $_GET["action"] == "edit" && isset($_GET['page']) && isset($_GET['meta_key']) && array_key_exists($key, $existing_values)){
+            $update_message = '<p>Your setting have been updated.</p>';
+          }
+
 
           $new_field_values = array();
           $new_field_values['meta_key'] = $key;

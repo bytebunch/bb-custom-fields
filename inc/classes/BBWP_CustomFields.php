@@ -54,6 +54,7 @@ class BBWP_CustomFields{
       $ui = $wp_scripts->query('jquery-ui-core');
 
       wp_enqueue_script('uploads');
+      wp_enqueue_script( 'postbox' );
       wp_enqueue_media();
 
       if (is_ssl())

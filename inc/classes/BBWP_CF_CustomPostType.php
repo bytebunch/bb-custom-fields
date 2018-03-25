@@ -29,7 +29,14 @@ class BBWP_CF_CustomPostType
         if( ! post_type_exists( $key ) )
         {
           // We set the default labels based on the post type name and plural. We overwrite them with the given labels.
-          $labels =
+          $overwrite_labels = array('menu_name', 'all_items', 'add_new', 'add_new_item', 'edit_item', 'new_item', 'view_item', 'view_items', 'search_items', 'not_found', 'not_found_in_trash', 'parent_item_colon', 'featured_image', 'set_featured_image', 'remove_featured_image', 'use_featured_image', 'archives', 'insert_into_item', 'uploaded_to_this_item', 'filter_items_list', 'items_list_navigation', 'items_list', 'attributes');
+          $post_type_labels = array();
+          foreach($overwrite_labels as $value){
+            if(isset($postType[$value]) && $postType[$value])
+                $post_type_labels[$value] = $postType[$value];
+          }
+          $labels = array_merge(
+              // Default
               array(
                   'name'                  => _x( $postType['label'], 'post type general name' ),
                   'singular_name'         => _x( $postType['singular_label'], 'post type singular name' ),
@@ -44,12 +51,59 @@ class BBWP_CF_CustomPostType
                   'not_found_in_trash'    => __( 'No ' . strtolower( $postType['label'] ) . ' found in Trash'),
                   'parent_item_colon'     => '',
                   'menu_name'             => $postType['label']
-                );
-
+                ),
+                // Given labels
+                $post_type_labels
+            );
 
 
           // Same principle as the labels. We set some defaults and overwrite them with the given arguments.
-          $args =
+        $overwrite_args = array('public', 'publicly_queryable', 'show_ui', 'show_in_nav_menus', 'show_in_rest', 'rest_base', 'has_archive', 'exclude_from_search', 'capability_type', 'hierarchical', 'rewrite', 'query_var', 'menu_position', 'show_in_menu', 'menu_icon', 'description');
+          $post_type_args = array();
+          foreach($overwrite_args as $value){
+            if(isset($postType[$value])){
+              if($postType[$value] === '1')
+                $post_type_args[$value] = true;
+              elseif($postType[$value] === '0'){
+                $post_type_args[$value] = false;
+              }
+              elseif($postType[$value])
+                $post_type_args[$value] = $postType[$value];
+            }
+          }
+
+          if(isset($postType['has_archive']) && $postType['has_archive'] == 1 && isset($postType['has_archive_string']) && $postType['has_archive_string'])
+            $post_type_args['has_archive'] = $postType['has_archive_string'];
+
+          if(isset($postType['query_var_slug']) && $postType['query_var_slug'] && isset($postType['query_var']) && $postType['query_var'] == 1)
+            $post_type_args['query_var'] = $postType['query_var_slug'];
+
+          if(isset($postType['show_in_menu_string']) && $postType['show_in_menu_string'] && isset($postType['show_in_menu']) && $postType['show_in_menu'] == 1)
+            $post_type_args['show_in_menu'] = $postType['show_in_menu_string'];
+
+          if(isset($postType['rewrite']) && $postType['rewrite'] == 1){
+            $rewrite = array();
+            if(isset($postType['rewrite_slug']) && $postType['rewrite_slug'])
+              $rewrite['slug'] = $postType['rewrite_slug'];
+            if(isset($postType['rewrite_withfront']))
+              $rewrite['with_front'] = $postType['rewrite_withfront'];
+            if(count($rewrite) >= 1)
+              $post_type_args['rewrite'] = $rewrite;
+          }
+
+          if(isset($postType['bbwpcf_pt_supports']) && is_array($postType['bbwpcf_pt_supports']) && count($postType['bbwpcf_pt_supports']) >= 1){
+            if(in_array('none', $postType['bbwpcf_pt_supports']))
+              $post_type_args['supports'] = false;
+            else
+              $post_type_args['supports'] = $postType['bbwpcf_pt_supports'];
+          }
+
+          if(isset($postType['bbwpcf_pt_taxonomies']) && is_array($postType['bbwpcf_pt_taxonomies']) && count($postType['bbwpcf_pt_taxonomies']) >= 1){
+              $post_type_args['taxonomies'] = $postType['bbwpcf_pt_taxonomies'];
+          }
+          
+          $args = array_merge(
+              // Default
               array(
                   'label'                 => $postType['label'],
                   'labels'                => $labels,
@@ -61,9 +115,11 @@ class BBWP_CF_CustomPostType
                   'show_in_nav_menus'     => true,
                   'menu_position'         => null,
                   '_builtin'              => false,
-                  //'supports'              => array( 'title', 'editor', 'thumbnail', 'custom-fields'),
-                  'supports' => array( 'title', 'editor', 'author', 'thumbnail', 'excerpt', 'comments', 'custom-fields')
-              );
+                  'supports' => array( 'title', 'editor', 'thumbnail')
+              ),
+              $post_type_args
+          );
+          //db($args);exit();
           // Register the post type
           register_post_type( $key, $args );
 
