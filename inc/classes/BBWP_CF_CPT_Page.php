@@ -1,4 +1,8 @@
 <?php
+// exit if file is called directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 class BBWP_CF_CPT_Page extends BBWP_CustomFields{
 
@@ -13,10 +17,8 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
   /***** page_bboptions_admin_menu function start from here *********/
   /******************************************/
   public function admin_menu(){
-
     /* add sub menu in our wordpress dashboard main menu */
     add_submenu_page( $this->prefix, 'Custom Post Types', 'Custom Post Types', 'manage_options', $this->prefix.'cpt', array($this,'add_submenu_page') );
-
   }
 
   /******************************************/
@@ -31,12 +33,12 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
 
     $user_created_post_types = SerializeStringToArray(get_option($this->prefix('user_created_post_types')));
 
-    echo '<h3> Add/Edit Post Types </h3>';
+    echo '<h3> '.__('Add/Edit Post Types', 'bbwp-custom-fields').' </h3>';
 
     if(isset($_GET['action']) && $_GET['action'] == 'edit' && isset($_GET['name']) && $_GET['name'] && count($user_created_post_types) >= 1 && array_key_exists($_GET['name'], $user_created_post_types)){
-      echo '<p><a href="?page='.sanitize_key($_GET['page']).'">← Back to Main Page</a></p>';
+      echo '<p><a href="?page='.sanitize_key($_GET['page']).'">← '.__('Back to Main Page', 'bbwp-custom-fields').'</a></p>';
       echo '<h2 class="nav-tab-wrapper bbwp_nav_wrapper">
-        <a href="#add-new-custom-taxonomies" class="nav-tab">Edit Post Type - '.$user_created_post_types[$_GET['name']]['label'].'</a>
+        <a href="#add-new-custom-taxonomies" class="nav-tab">'.__('Edit Post Type', 'bbwp-custom-fields').' - '.$user_created_post_types[$_GET['name']]['label'].'</a>
       </h2>';
       BBWPUpdateErrorMessage();
       $this->CreatePostTypeForm($user_created_post_types, $_GET['name']);
@@ -46,9 +48,9 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
     BBWPUpdateErrorMessage();
     ?>
           <h2 class="nav-tab-wrapper bbwp_nav_wrapper">
-            <a href="#add-new-custom-post-types" class="nav-tab">Add New Post Type</a>
+            <a href="#add-new-custom-post-types" class="nav-tab"><?php _e('Add New Post Type', 'bbwp-custom-fields'); ?></a>
             <?php if($user_created_post_types && is_array($user_created_post_types) && count($user_created_post_types) >= 1){ ?>
-              <a href="#existing-custom-post-types" class="nav-tab">Edit Custom Post Types</a>
+              <a href="#existing-custom-post-types" class="nav-tab"><?php _e('Edit Custom Post Types', 'bbwp-custom-fields'); ?></a>
             <?php } ?>
           </h2>
 
@@ -58,8 +60,8 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
           <div class="bbwp_tab_nav_content" id="existing-custom-post-types" style="display:none;">
             <?php
             if($user_created_post_types && is_array($user_created_post_types) && count($user_created_post_types) >= 1){
-              echo '<form method="post" action=""><h3>Existing Post Types</h3>';
-              $tableColumns = array("name" => "Post Type Slug/Name", "label" => "Plural Label");
+              echo '<form method="post" action=""><h3>'.__('Existing Post Types', 'bbwp-custom-fields').'</h3>';
+              $tableColumns = array("name" => __("Post Type Slug/Name", 'bbwp-custom-fields'), "label" => __("Plural Label", 'bbwp-custom-fields'));
               $BBWPListTable = new BBWPListTable();
               $BBWPListTable->get_columns($tableColumns);
               $BBWPListTable->bulk_actions = array("delete" => "Delete Selected");
@@ -67,8 +69,8 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
               $BBWPListTable->actions = array('name' => array('delete', 'edit'));
               $BBWPListTable->prepare_items($user_created_post_types);
               $BBWPListTable->display();
-              echo '<input type="hidden" name="sort_fields" value="'.$this->prefix('user_created_post_types').'" />';
-              submit_button('Save Changes', 'primary alignright');
+              echo '<input type="hidden" name="sort_fields" value="'.esc_attr($this->prefix('user_created_post_types')).'" />';
+              submit_button(__('Save Changes', 'bbwp-custom-fields'), 'primary alignright');
               echo '</form>';
             }
             ?>
@@ -92,12 +94,15 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
     echo '<select id="'.$svalue.'" name="user_created_post_type['.$svalue.']">'.ArraytoSelectList($trueFalse, $selected_value).'</select>';
   }
 
-  private function selectedText($svalue, $dvalue = ''){
+  private function selectedText($svalue, $dvalue = '', $esc = true){
     $selected_value = $dvalue;
     if(isset($this->edit_post_type_values) && isset($this->edit_post_type_values[$svalue]) && $this->edit_post_type_values[$svalue]){
       $selected_value = $this->edit_post_type_values[$svalue];
     }
-    echo $selected_value;
+		if($esc != true)
+    	echo $selected_value;
+		else
+			echo esc_attr($selected_value);
   }
 
   private function CreatePostTypeForm($user_created_post_types = array(), $edit_post_type = false){
@@ -106,13 +111,13 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
     if($edit_post_type && is_array($user_created_post_types) && count($user_created_post_types) >= 1 && array_key_exists($edit_post_type, $user_created_post_types)){
       $edit_post_type_values = $user_created_post_types[$edit_post_type];
       $this->edit_post_type_values = $edit_post_type_values;
-      echo '<input type="hidden" name="update_created_post_type" value="'.$edit_post_type.'" />';
+      echo '<input type="hidden" name="update_created_post_type" value="'.esc_attr($edit_post_type).'" />';
     }else{
       $edit_post_type_values['bbwpcf_pt_supports'] = array('title', 'editor', 'thumbnail');
     }
 
       ?>
-      <input type="hidden" name="create_new_post_type" value="<?php echo $this->prefix('create_new_post_type'); ?>" />
+      <input type="hidden" name="create_new_post_type" value="<?php echo esc_attr($this->prefix('create_new_post_type')); ?>" />
       <div class="meta-box-sortables ui-sortable">
         <div class="postbox ">
           <button type="button" class="handlediv" aria-expanded="true"><span class="screen-reader-text">Toggle panel </span><span class="toggle-indicator" aria-hidden="true"></span></button>
@@ -165,28 +170,28 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                     <th scope="row"><label for="publicly_queryable">Publicly Queryable</label></th>
                     <td>
                       <?php $this->TrueFalse('publicly_queryable', '1'); ?>
-                      <span class="cptui-field-description">(default: true) Whether or not queries can be performed on the front end as part of parse_request()</span>
+                      <span class="bbwpcf-field-description">(default: true) Whether or not queries can be performed on the front end as part of parse_request()</span>
                     </td>
                   </tr>
                   <tr valign="top">
                     <th scope="row"><label for="show_ui">Show UI</label></th>
                     <td>
                       <?php $this->TrueFalse('show_ui', '1'); ?>
-                      <span class="cptui-field-description">(default: true) Whether or not to generate a default UI for managing this post type.</span>
+                      <span class="bbwpcf-field-description">(default: true) Whether or not to generate a default UI for managing this post type.</span>
                     </td>
                   </tr>
                   <tr valign="top">
                     <th scope="row"><label for="show_in_nav_menus">Show in Nav Menus</label></th>
                     <td>
                       <?php $this->TrueFalse('show_in_nav_menus', '1'); ?>
-                      <span class="cptui-field-description">(default: true) Whether or not this post type is available for selection in navigation menus.</span>
+                      <span class="bbwpcf-field-description">(default: true) Whether or not this post type is available for selection in navigation menus.</span>
                     </td>
                   </tr>
                   <tr valign="top">
                     <th scope="row"><label for="show_in_rest">Show in REST API</label></th>
                     <td>
                       <?php $this->TrueFalse('show_in_rest', '0'); ?>
-                      <span class="cptui-field-description">(default: false) Whether or not to show this post type data in the WP REST API.</span>
+                      <span class="bbwpcf-field-description">(default: false) Whether or not to show this post type data in the WP REST API.</span>
                     </td>
                   </tr>
                   <tr valign="top">
@@ -200,7 +205,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                     <th scope="row"><label for="has_archive">Has Archive</label><p>If left blank, the archive slug will default to the post type slug.</p></th>
                     <td>
                       <?php $this->TrueFalse('has_archive', '0'); ?>
-                      <span class="cptui-field-description">(default: false) Whether or not the post type will have a post type archive URL.</span><br>
+                      <span class="bbwpcf-field-description">(default: false) Whether or not the post type will have a post type archive URL.</span><br>
                       <input type="text" id="has_archive_string" name="user_created_post_type[has_archive_string]" value="<?php $this->selectedText('has_archive_string'); ?>" aria-required="false" placeholder="Slug to be used for archive URL.">
                       <span class="visuallyhidden">Slug to be used for archive URL.</span>
                     </td>
@@ -209,28 +214,28 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                     <th scope="row"><label for="exclude_from_search">Exclude From Search</label></th>
                     <td>
                       <?php $this->TrueFalse('exclude_from_search', '0'); ?>
-                      <span class="cptui-field-description">(default: false) Whether or not to exclude posts with this post type from front end search results.</span>
+                      <span class="bbwpcf-field-description">(default: false) Whether or not to exclude posts with this post type from front end search results.</span>
                     </td>
                   </tr>
                   <tr valign="top">
                     <th scope="row"><label for="capability_type">Capability Type</label></th>
                     <td>
                       <input type="text" id="capability_type" name="user_created_post_type[capability_type]" value="<?php $this->selectedText('capability_type', 'post'); ?>" aria-required="false"><br>
-                      <span class="cptui-field-description">The post type to use for checking read, edit, and delete capabilities.</span>
+                      <span class="bbwpcf-field-description">The post type to use for checking read, edit, and delete capabilities.</span>
                     </td>
                   </tr>
                   <tr valign="top">
                     <th scope="row"><label for="hierarchical">Hierarchical</label></th>
                     <td>
                       <?php $this->TrueFalse('hierarchical', '0'); ?>
-                      <span class="cptui-field-description">(default: false) Whether or not the post type can have parent-child relationships.</span>
+                      <span class="bbwpcf-field-description">(default: false) Whether or not the post type can have parent-child relationships.</span>
                     </td>
                   </tr>
                   <tr valign="top">
                     <th scope="row"><label for="rewrite">Rewrite</label></th>
                     <td>
                       <?php $this->TrueFalse('rewrite', '1'); ?>
-                      <span class="cptui-field-description">(default: true) Whether or not WordPress should use rewrites for this post type.</span>
+                      <span class="bbwpcf-field-description">(default: true) Whether or not WordPress should use rewrites for this post type.</span>
                     </td>
                   </tr>
                   <tr valign="top">
@@ -238,21 +243,21 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                     <td>
                       <input type="text" id="rewrite_slug" name="user_created_post_type[rewrite_slug]" value="<?php $this->selectedText('rewrite_slug'); ?>" aria-required="false" placeholder="(default: post type slug)">
                       <span class="visuallyhidden">(default: post type slug)</span><br>
-                      <span class="cptui-field-description">Custom post type slug to use instead of the default.</span>
+                      <span class="bbwpcf-field-description">Custom post type slug to use instead of the default.</span>
                     </td>
                   </tr>
                   <tr valign="top">
                     <th scope="row"><label for="rewrite_withfront">With Front</label></th>
                     <td>
                       <?php $this->TrueFalse('rewrite_withfront', '1'); ?>
-                      <span class="cptui-field-description">(default: true) Should the permastruct be prepended with the front base.</span>
+                      <span class="bbwpcf-field-description">(default: true) Should the permastruct be prepended with the front base.</span>
                     </td>
                   </tr>
                   <tr valign="top">
                     <th scope="row"><label for="query_var">Query Var</label></th>
                     <td>
                       <?php $this->TrueFalse('query_var', '1'); ?>
-                      <span class="cptui-field-description">(default: true) Sets the query_var key for this post type.</span>
+                      <span class="bbwpcf-field-description">(default: true) Sets the query_var key for this post type.</span>
                     </td>
                   </tr>
                   <tr valign="top">
@@ -260,23 +265,23 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                     <td>
                       <input type="text" id="query_var_slug" name="user_created_post_type[query_var_slug]" value="<?php $this->selectedText('query_var_slug'); ?>" aria-required="false" placeholder="(default: post type slug) Query var needs to be true to use.">
                       <span class="visuallyhidden">(default: post type slug) Query var needs to be true to use.</span><br>
-                      <span class="cptui-field-description">Custom query var slug to use instead of the default.</span>
+                      <span class="bbwpcf-field-description">Custom query var slug to use instead of the default.</span>
                     </td>
                   </tr>
                   <tr valign="top">
                     <th scope="row"><label for="menu_position">Menu Position</label><p>See <a href="http://codex.wordpress.org/Function_Reference/register_post_type#Parameters" target="_blank">Available options</a> in the "menu_position" section. Range of 5-100</p></th>
                     <td>
                       <input type="text" id="menu_position" name="user_created_post_type[menu_position]" value="<?php $this->selectedText('menu_position'); ?>" aria-required="false"><br>
-                      <span class="cptui-field-description">The position in the menu order the post type should appear. show_in_menu must be true.</span>
+                      <span class="bbwpcf-field-description">The position in the menu order the post type should appear. show_in_menu must be true.</span>
                     </td>
                   </tr>
                   <tr valign="top">
                     <th scope="row"><label for="show_in_menu">Show in Menu</label><p>"Show UI" must be "true". If an existing top level page such as "tools.php" is indicated for second input, post type will be sub menu of that.</p></th>
                     <td>
                       <?php $this->TrueFalse('show_in_menu', '1'); ?>
-                      <span class="cptui-field-description">(default: true) Whether or not to show the post type in the admin menu and where to show that menu.</span><br>
+                      <span class="bbwpcf-field-description">(default: true) Whether or not to show the post type in the admin menu and where to show that menu.</span><br>
                       <input type="text" id="show_in_menu_string" name="user_created_post_type[show_in_menu_string]" value="<?php $this->selectedText('show_in_menu_string'); ?>" aria-required="false"><br>
-                      <span class="cptui-field-description">The top-level admin menu page file name for which the post type should be in the sub menu of.</span>
+                      <span class="bbwpcf-field-description">The top-level admin menu page file name for which the post type should be in the sub menu of.</span>
                     </td>
                   </tr>
                   <tr valign="top">
@@ -284,7 +289,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                     <td>
                       <input type="text" id="menu_icon" name="user_created_post_type[menu_icon]" value="<?php $this->selectedText('menu_icon'); ?>" aria-required="false" placeholder="(Full URL for icon or Dashicon class)">
                       <span class="visuallyhidden">(Full URL for icon or Dashicon class)</span><br>
-                      <span class="cptui-field-description">Image URL or Dashicon class name to use for icon. Custom image should be 20px by 20px.</span>
+                      <span class="bbwpcf-field-description">Image URL or Dashicon class name to use for icon. Custom image should be 20px by 20px.</span>
                       </td>
                     </tr>
                     <tr valign="top">
@@ -309,7 +314,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                           foreach ($bbwpcf_pt_support as $key => $value) {
                             $checked = '';
                             if(isset($edit_post_type_values['bbwpcf_pt_supports']) && is_array($edit_post_type_values['bbwpcf_pt_supports']) && in_array($key, $edit_post_type_values['bbwpcf_pt_supports'])){ $checked = 'checked="checked"'; }
-                            echo '<input type="checkbox" id="'.$key.'" name="bbwpcf_pt_supports[]" value="'.$key.'" '.$checked.'><label for="'.$key.'">'.$value.'</label><br>';
+                            echo '<input type="checkbox" id="'.$key.'" name="bbwpcf_pt_supports[]" value="'.esc_attr($key).'" '.$checked.'><label for="'.$key.'">'.$value.'</label><br>';
                           }
                           ?>
                         </fieldset>
@@ -320,7 +325,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                       <td>
                         <?php $selected_value = ''; if(isset($edit_post_type_values['custom_supports'])){ $selected_value = $edit_post_type_values['custom_supports']; } ?>
                         <input type="text" id="custom_supports" name="cpt_custom_post_type[custom_supports]" value="<?php echo $selected_value; ?>" aria-required="false"><br>
-                        <span class="cptui-field-description">Provide custom support slugs here.</span>
+                        <span class="bbwpcf-field-description">Provide custom support slugs here.</span>
                       </td>
                     </tr>*/ ?>
                     <tr valign="top">
@@ -335,7 +340,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                               continue;
                             $checked = '';
                             if(isset($edit_post_type_values['bbwpcf_pt_taxonomies']) && is_array($edit_post_type_values['bbwpcf_pt_taxonomies']) && in_array($key, $edit_post_type_values['bbwpcf_pt_taxonomies'])){ $checked = 'checked="checked"'; }
-                            echo '<input type="checkbox" id="'.$key.'" name="bbwpcf_pt_taxonomies[]" value="'.$key.'" '.$checked.'><label for="'.$key.'">'.$value->label.'</label><br>';
+                            echo '<input type="checkbox" id="'.$key.'" name="bbwpcf_pt_taxonomies[]" value="'.esc_attr($key).'" '.$checked.'><label for="'.$key.'">'.$value->label.'</label><br>';
                           }
                           ?>
 
@@ -356,8 +361,8 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
 							<tr valign="top">
                 <th scope="row"><label for="description">Post Type Description</label></th>
                 <td>
-                  <textarea id="description" name="user_created_post_type[description]" rows="4" cols="40"><?php $this->selectedText('description'); ?></textarea><br>
-                  <span class="cptui-field-description">Perhaps describe what your custom post type is used for?</span>
+                  <textarea id="description" name="user_created_post_type[description]" rows="4" cols="40"><?php $this->selectedText('description', '', false); ?></textarea><br>
+                  <span class="bbwpcf-field-description">Perhaps describe what your custom post type is used for?</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -365,7 +370,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="menu_name" name="user_created_post_type[menu_name]" value="<?php $this->selectedText('menu_name'); ?>" aria-required="false" placeholder="(e.g. My Movies)">
                   <span class="visuallyhidden">(e.g. My Movies)</span><br>
-                  <span class="cptui-field-description">Custom admin menu name for your custom post type.</span>
+                  <span class="bbwpcf-field-description">Custom admin menu name for your custom post type.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -373,7 +378,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="all_items" name="user_created_post_type[all_items]" value="<?php $this->selectedText('all_items'); ?>" aria-required="false" placeholder="(e.g. All Movies)">
                   <span class="visuallyhidden">(e.g. All Movies)</span><br>
-                  <span class="cptui-field-description">Used in the post type admin submenu.</span>
+                  <span class="bbwpcf-field-description">Used in the post type admin submenu.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -381,21 +386,21 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="add_new" name="user_created_post_type[add_new]" value="<?php $this->selectedText('add_new'); ?>" aria-required="false" placeholder="(e.g. Add New)">
                   <span class="visuallyhidden">(e.g. Add New)</span><br>
-                  <span class="cptui-field-description">Used in the post type admin submenu.</span>
+                  <span class="bbwpcf-field-description">Used in the post type admin submenu.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="add_new_item">Add New Item</label></th>
                 <td><input type="text" id="add_new_item" name="user_created_post_type[add_new_item]" value="<?php $this->selectedText('add_new_item'); ?>" aria-required="false" placeholder="(e.g. Add New Movie)">
                   <span class="visuallyhidden">(e.g. Add New Movie)</span><br>
-                  <span class="cptui-field-description">Used at the top of the post editor screen for a new post type post.</span>
+                  <span class="bbwpcf-field-description">Used at the top of the post editor screen for a new post type post.</span>
                 </td>
               </tr>
               <tr valign="top"><th scope="row"><label for="edit_item">Edit Item</label></th>
                 <td>
                   <input type="text" id="edit_item" name="user_created_post_type[edit_item]" value="<?php $this->selectedText('edit_item'); ?>" aria-required="false" placeholder="(e.g. Edit Movie)">
                   <span class="visuallyhidden">(e.g. Edit Movie)</span><br>
-                  <span class="cptui-field-description">Used at the top of the post editor screen for an existing post type post.</span>
+                  <span class="bbwpcf-field-description">Used at the top of the post editor screen for an existing post type post.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -403,7 +408,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="new_item" name="user_created_post_type[new_item]" value="<?php $this->selectedText('new_item'); ?>" aria-required="false" placeholder="(e.g. New Movie)">
                   <span class="visuallyhidden">(e.g. New Movie)</span><br>
-                  <span class="cptui-field-description">Post type label. Used in the admin menu for displaying post types.</span>
+                  <span class="bbwpcf-field-description">Post type label. Used in the admin menu for displaying post types.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -411,7 +416,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="view_item" name="user_created_post_type[view_item]" value="<?php $this->selectedText('view_item'); ?>" aria-required="false" placeholder="(e.g. View Movie)">
                   <span class="visuallyhidden">(e.g. View Movie)</span><br>
-                  <span class="cptui-field-description">Used in the admin bar when viewing editor screen for a published post in the post type.</span>
+                  <span class="bbwpcf-field-description">Used in the admin bar when viewing editor screen for a published post in the post type.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -419,7 +424,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="view_items" name="user_created_post_type[view_items]" value="<?php $this->selectedText('view_items'); ?>" aria-required="false" placeholder="(e.g. View Movies)">
                   <span class="visuallyhidden">(e.g. View Movies)</span><br>
-                  <span class="cptui-field-description">Used in the admin bar when viewing editor screen for a published post in the post type.</span>
+                  <span class="bbwpcf-field-description">Used in the admin bar when viewing editor screen for a published post in the post type.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -427,7 +432,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="search_items" name="user_created_post_type[search_items]" value="<?php $this->selectedText('search_items'); ?>" aria-required="false" placeholder="(e.g. Search Movie)">
                   <span class="visuallyhidden">(e.g. Search Movie)</span><br>
-                  <span class="cptui-field-description">Used as the text for the search button on post type list screen.</span>
+                  <span class="bbwpcf-field-description">Used as the text for the search button on post type list screen.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -435,7 +440,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="not_found" name="user_created_post_type[not_found]" value="<?php $this->selectedText('not_found'); ?>" aria-required="false" placeholder="(e.g. No Movies found)">
                   <span class="visuallyhidden">(e.g. No Movies found)</span><br>
-                  <span class="cptui-field-description">Used when there are no posts to display on the post type list screen.</span>
+                  <span class="bbwpcf-field-description">Used when there are no posts to display on the post type list screen.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -443,7 +448,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="not_found_in_trash" name="user_created_post_type[not_found_in_trash]" value="<?php $this->selectedText('not_found_in_trash'); ?>" aria-required="false" placeholder="(e.g. No Movies found in Trash)">
                   <span class="visuallyhidden">(e.g. No Movies found in Trash)</span><br>
-                  <span class="cptui-field-description">Used when there are no posts to display on the post type list trash screen.</span>
+                  <span class="bbwpcf-field-description">Used when there are no posts to display on the post type list trash screen.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -451,7 +456,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="parent" name="user_created_post_type[parent_item_colon]" value="<?php $this->selectedText('parent_item_colon'); ?>" aria-required="false" placeholder="(e.g. Parent Movie:)">
                   <span class="visuallyhidden">(e.g. Parent Movie:)</span><br>
-                  <span class="cptui-field-description">Used for hierarchical types that need a colon.</span>
+                  <span class="bbwpcf-field-description">Used for hierarchical types that need a colon.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -459,7 +464,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="featured_image" name="user_created_post_type[featured_image]" value="<?php $this->selectedText('featured_image'); ?>" aria-required="false" placeholder="(e.g. Featured image for this movie)">
                   <span class="visuallyhidden">(e.g. Featured image for this movie)</span><br>
-                  <span class="cptui-field-description">Used as the "Featured Image" phrase for the post type.</span>
+                  <span class="bbwpcf-field-description">Used as the "Featured Image" phrase for the post type.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -467,14 +472,14 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="set_featured_image" name="user_created_post_type[set_featured_image]" value="<?php $this->selectedText('set_featured_image'); ?>" aria-required="false" placeholder="(e.g. Set featured image for this movie)">
                   <span class="visuallyhidden">(e.g. Set featured image for this movie)</span><br>
-                  <span class="cptui-field-description">Used as the "Set featured image" phrase for the post type.</span>
+                  <span class="bbwpcf-field-description">Used as the "Set featured image" phrase for the post type.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="remove_featured_image">Remove Featured Image</label></th>
                 <td>
                   <input type="text" id="remove_featured_image" name="user_created_post_type[remove_featured_image]" value="<?php $this->selectedText('remove_featured_image'); ?>" aria-required="false" placeholder="(e.g. Remove featured image for this movie)">
-                  <span class="visuallyhidden">(e.g. Remove featured image for this movie)</span><br><span class="cptui-field-description">Used as the "Remove featured image" phrase for the post type.</span>
+                  <span class="visuallyhidden">(e.g. Remove featured image for this movie)</span><br><span class="bbwpcf-field-description">Used as the "Remove featured image" phrase for the post type.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -482,7 +487,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="use_featured_image" name="user_created_post_type[use_featured_image]" value="<?php $this->selectedText('use_featured_image'); ?>" aria-required="false" placeholder="(e.g. Use as featured image for this movie)">
                   <span class="visuallyhidden">(e.g. Use as featured image for this movie)</span><br>
-                  <span class="cptui-field-description">Used as the "Use as featured image" phrase for the post type.</span>
+                  <span class="bbwpcf-field-description">Used as the "Use as featured image" phrase for the post type.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -490,7 +495,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="archives" name="user_created_post_type[archives]" value="<?php $this->selectedText('archives'); ?>" aria-required="false" placeholder="(e.g. Movie archives)">
                   <span class="visuallyhidden">(e.g. Movie archives)</span><br>
-                  <span class="cptui-field-description">Post type archive label used in nav menus.</span>
+                  <span class="bbwpcf-field-description">Post type archive label used in nav menus.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -498,7 +503,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="insert_into_item" name="user_created_post_type[insert_into_item]" value="<?php $this->selectedText('insert_into_item'); ?>" aria-required="false" placeholder="(e.g. Insert into movie)">
                   <span class="visuallyhidden">(e.g. Insert into movie)</span><br>
-                  <span class="cptui-field-description">Used as the "Insert into post" or "Insert into page" phrase for the post type.</span>
+                  <span class="bbwpcf-field-description">Used as the "Insert into post" or "Insert into page" phrase for the post type.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -506,7 +511,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="uploaded_to_this_item" name="user_created_post_type[uploaded_to_this_item]" value="<?php $this->selectedText('uploaded_to_this_item'); ?>" aria-required="false" placeholder="(e.g. Uploaded to this movie)">
                   <span class="visuallyhidden">(e.g. Uploaded to this movie)</span><br>
-                  <span class="cptui-field-description">Used as the "Uploaded to this post" or "Uploaded to this page" phrase for the post type.</span>
+                  <span class="bbwpcf-field-description">Used as the "Uploaded to this post" or "Uploaded to this page" phrase for the post type.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -514,7 +519,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="filter_items_list" name="user_created_post_type[filter_items_list]" value="<?php $this->selectedText('filter_items_list'); ?>" aria-required="false" placeholder="(e.g. Filter movies list)">
                   <span class="visuallyhidden">(e.g. Filter movies list)</span><br>
-                  <span class="cptui-field-description">Screen reader text for the filter links heading on the post type listing screen.</span>
+                  <span class="bbwpcf-field-description">Screen reader text for the filter links heading on the post type listing screen.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -522,7 +527,7 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="items_list_navigation" name="user_created_post_type[items_list_navigation]" value="<?php $this->selectedText('items_list_navigation'); ?>" aria-required="false" placeholder="(e.g. Movies list navigation)">
                   <span class="visuallyhidden">(e.g. Movies list navigation)</span><br>
-                  <span class="cptui-field-description">Screen reader text for the pagination heading on the post type listing screen.</span>
+                  <span class="bbwpcf-field-description">Screen reader text for the pagination heading on the post type listing screen.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -530,14 +535,14 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="items_list" name="user_created_post_type[items_list]" value="<?php $this->selectedText('items_list'); ?>" aria-required="false" placeholder="(e.g. Movies list)">
                   <span class="visuallyhidden">(e.g. Movies list)</span><br>
-                  <span class="cptui-field-description">Screen reader text for the items list heading on the post type listing screen.</span>
+                  <span class="bbwpcf-field-description">Screen reader text for the items list heading on the post type listing screen.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="attributes">Attributes</label></th>
                 <td>
                   <input type="text" id="attributes" name="user_created_post_type[attributes]" value="<?php $this->selectedText('attributes'); ?>" aria-required="false" placeholder="(e.g. Movies Attributes)"><span class="visuallyhidden">(e.g. Movies Attributes)</span><br>
-                  <span class="cptui-field-description">Used for the title of the post attributes meta box.</span>
+                  <span class="bbwpcf-field-description">Used for the title of the post attributes meta box.</span>
                 </td>
               </tr>
             </table>
@@ -591,8 +596,11 @@ class BBWP_CF_CPT_Page extends BBWP_CustomFields{
                   $new_values['bbwpcf_pt_taxonomies'] = $_POST['bbwpcf_pt_taxonomies'];
 
               }
+							elseif($key == 'description'){
+								$new_values[$key] = BBWPSanitization::Textarea($value);
+							}
               else{
-                if($value == 0)
+                if($value === '0')
                   $new_values[$key] = $value;
                 else
                   $new_values[$key] = BBWPSanitization::Textfield($value);

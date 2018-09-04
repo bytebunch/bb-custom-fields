@@ -1,4 +1,8 @@
 <?php
+// exit if file is called directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 class BBWP_CF_CT_Page extends BBWP_CustomFields{
 
@@ -92,12 +96,15 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
     echo '<select id="'.$svalue.'" name="user_created_taxonomy['.$svalue.']">'.ArraytoSelectList($trueFalse, $selected_value).'</select>';
   }
 
-  private function selectedText($svalue, $dvalue = ''){
+  private function selectedText($svalue, $dvalue = '', $esc = true){
     $selected_value = $dvalue;
     if(isset($this->edit_taxonomy_values) && isset($this->edit_taxonomy_values[$svalue]) && $this->edit_taxonomy_values[$svalue]){
       $selected_value = $this->edit_taxonomy_values[$svalue];
     }
-    echo $selected_value;
+		if($esc != true)
+    	echo $selected_value;
+		else
+			echo esc_attr($selected_value);
   }
 
   private function CreateTaxonomyForm($user_created_taxonomies = array(), $edit_taxonomy = false){
@@ -121,7 +128,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <th scope="row"><label for="name">Taxonomy Slug: <span class="require_star">*</span></label></th>
                 <td>
                   <?php $selected_value = ''; if(isset($edit_taxonomy_values['name'])){ $selected_value = $edit_taxonomy_values['name']; } ?>
-                  <input type="text" name="user_created_taxonomy[name]" id="name" class="regular-text" required="required" value="<?php echo $selected_value; ?>" />
+                  <input type="text" name="user_created_taxonomy[name]" id="name" class="regular-text" required="required" value="<?php echo esc_attr($selected_value); ?>" />
                   <br /><span class="bbwpcf-field-description">The Taxonomy name/slug. Used for various queries for Taxonomy content.</span>
                   <p>Slugs should only contain alphanumeric, latin characters. Underscores should be used in place of spaces. Set "Custom Rewrite Slug" field to make slug use dashes for URLs.</p>
                 </td>
@@ -130,7 +137,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <th scope="row"><label for="label">Plural Label <span class="require_star">*</span></label></th>
                 <td>
                   <?php $selected_value = ''; if(isset($edit_taxonomy_values['label'])){ $selected_value = $edit_taxonomy_values['label']; } ?>
-                  <input type="text" name="user_created_taxonomy[label]" id="label" class="regular-text" required="required" value="<?php echo $selected_value; ?>" />
+                  <input type="text" name="user_created_taxonomy[label]" id="label" class="regular-text" required="required" value="<?php echo esc_attr($selected_value); ?>" />
                   <br /><span class="bbwpcf-field-description">Used for the taxonomy admin menu item.</span>
                 </td>
               </tr>
@@ -138,7 +145,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <th scope="row"><label for="singular_label">Singular Label <span class="require_star">*</span></label></th>
                 <td>
                   <?php $selected_value = ''; if(isset($edit_taxonomy_values['singular_label'])){ $selected_value = $edit_taxonomy_values['singular_label']; } ?>
-                  <input type="text" name="user_created_taxonomy[singular_label]" id="singular_label" class="regular-text" required="required" value="<?php echo $selected_value; ?>" />
+                  <input type="text" name="user_created_taxonomy[singular_label]" id="singular_label" class="regular-text" required="required" value="<?php echo esc_attr($selected_value); ?>" />
                   <br /><span class="bbwpcf-field-description">Used when a singular label is needed.</span>
                 </td>
               </tr>
@@ -157,9 +164,9 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                       if($post_type == 'attachment')
                         continue;
                         if(in_array($post_type, $selected_value))
-                          echo '<input type="checkbox" id="'.$post_type.'" name="bbwpcf_posts[]" value="'.$post_type.'" checked="checked"><label for="'.$post_type.'">'.ucfirst(str_ireplace(array("-","_"), array(" ", " "), $post_type)).'</label><br>';
+                          echo '<input type="checkbox" id="'.$post_type.'" name="bbwpcf_posts[]" value="'.esc_attr($post_type).'" checked="checked"><label for="'.$post_type.'">'.ucfirst(str_ireplace(array("-","_"), array(" ", " "), $post_type)).'</label><br>';
                         else
-                          echo '<input type="checkbox" id="'.$post_type.'" name="bbwpcf_posts[]" value="'.$post_type.'"><label for="'.$post_type.'">'.ucfirst(str_ireplace(array("-","_"), array(" ", " "), $post_type)).'</label><br>';
+                          echo '<input type="checkbox" id="'.$post_type.'" name="bbwpcf_posts[]" value="'.esc_attr($post_type).'"><label for="'.$post_type.'">'.ucfirst(str_ireplace(array("-","_"), array(" ", " "), $post_type)).'</label><br>';
                     }
                     ?>
                   </fieldset>
@@ -170,8 +177,6 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
           </div>
         </div><!-- postbox-->
       </div><!-- meta-box-sortables -->
-
-
 
 
       <div class="meta-box-sortables ui-sortable">
@@ -191,101 +196,101 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <th scope="row"><label for="hierarchical">Hierarchical</label></th>
                 <td>
                   <?php $this->TrueFalse('hierarchical', '0'); ?>
-                  <span class="cptui-field-description">(default: false) Whether the taxonomy can have parent-child relationships.</span>
+                  <span class="bbwpcf-field-description">(default: false) Whether the taxonomy can have parent-child relationships.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="show_ui">Show UI</label></th>
                 <td>
                   <?php $this->TrueFalse('show_ui', '1'); ?>
-                  <span class="cptui-field-description">(default: true) Whether to generate a default UI for managing this custom taxonomy.</span>
+                  <span class="bbwpcf-field-description">(default: true) Whether to generate a default UI for managing this custom taxonomy.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="show_in_menu">Show in menu</label></th>
                 <td>
                   <?php $this->TrueFalse('show_in_menu', '1'); ?>
-                  <span class="cptui-field-description">(default: value of show_ui) Whether to show the taxonomy in the admin menu.</span>
+                  <span class="bbwpcf-field-description">(default: value of show_ui) Whether to show the taxonomy in the admin menu.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="show_in_nav_menus">Show in nav menus</label></th>
                 <td>
                    <?php $this->TrueFalse('show_in_nav_menus', '1'); ?>
-                  <span class="cptui-field-description">(default: value of public) Whether to make the taxonomy available for selection in navigation menus.</span></td>
+                  <span class="bbwpcf-field-description">(default: value of public) Whether to make the taxonomy available for selection in navigation menus.</span></td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="query_var">Query Var</label></th>
                 <td>
                   <?php $this->TrueFalse('query_var', '1'); ?>
-                  <span class="cptui-field-description">(default: true) Sets the query_var key for this taxonomy.</span>
+                  <span class="bbwpcf-field-description">(default: true) Sets the query_var key for this taxonomy.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="query_var_slug">Custom Query Var String</label></th>
                 <td>
                   <?php $selected_value = ''; if(isset($edit_taxonomy_values['query_var_slug'])){ $selected_value = $edit_taxonomy_values['query_var_slug']; } ?>
-                  <input type="text" id="query_var_slug" name="user_created_taxonomy[query_var_slug]" value="<?php echo $selected_value; ?>" aria-required="false" placeholder="(default: taxonomy slug). Query var needs to be true to use.">
-                  <span class="visuallyhidden">(default: taxonomy slug). Query var needs to be true to use.</span><br><span class="cptui-field-description">Sets a custom query_var slug for this taxonomy.</span>
+                  <input type="text" id="query_var_slug" name="user_created_taxonomy[query_var_slug]" value="<?php echo esc_attr($selected_value); ?>" aria-required="false" placeholder="(default: taxonomy slug). Query var needs to be true to use.">
+                  <span class="visuallyhidden">(default: taxonomy slug). Query var needs to be true to use.</span><br><span class="bbwpcf-field-description">Sets a custom query_var slug for this taxonomy.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="rewrite">Rewrite</label></th>
                 <td>
                   <?php $this->TrueFalse('rewrite', '1'); ?>
-                  <span class="cptui-field-description">(default: true) Whether or not WordPress should use rewrites for this taxonomy.</span>
+                  <span class="bbwpcf-field-description">(default: true) Whether or not WordPress should use rewrites for this taxonomy.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="rewrite_slug">Custom Rewrite Slug</label></th>
                 <td>
                   <?php $selected_value = ''; if(isset($edit_taxonomy_values['rewrite_slug'])){ $selected_value = $edit_taxonomy_values['rewrite_slug']; } ?>
-                  <input type="text" id="rewrite_slug" name="user_created_taxonomy[rewrite_slug]" aria-required="false" placeholder="(default: taxonomy name)" value="<?php echo $selected_value; ?>">
+                  <input type="text" id="rewrite_slug" name="user_created_taxonomy[rewrite_slug]" aria-required="false" placeholder="(default: taxonomy name)" value="<?php echo esc_attr($selected_value); ?>">
                   <span class="visuallyhidden">(default: taxonomy name)</span><br>
-                  <span class="cptui-field-description">Custom taxonomy rewrite slug.</span>
+                  <span class="bbwpcf-field-description">Custom taxonomy rewrite slug.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="rewrite_withfront">Rewrite With Front</label></th>
                 <td>
                   <?php $this->TrueFalse('rewrite_withfront', '1'); ?>
-                  <span class="cptui-field-description">(default: true) Should the permastruct be prepended with the front base.</span>
+                  <span class="bbwpcf-field-description">(default: true) Should the permastruct be prepended with the front base.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="rewrite_hierarchical">Rewrite Hierarchical</label></th>
                 <td>
                   <?php $this->TrueFalse('rewrite_hierarchical', '0'); ?>
-                  <span class="cptui-field-description">(default: false) Should the permastruct allow hierarchical urls.</span>
+                  <span class="bbwpcf-field-description">(default: false) Should the permastruct allow hierarchical urls.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="show_admin_column">Show Admin Column</label></th>
                 <td>
                   <?php $this->TrueFalse('show_admin_column', '0'); ?>
-                  <span class="cptui-field-description">(default: false) Whether to allow automatic creation of taxonomy columns on associated post-types.</span>
+                  <span class="bbwpcf-field-description">(default: false) Whether to allow automatic creation of taxonomy columns on associated post-types.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="show_in_rest">Show in REST API</label></th>
                 <td>
                   <?php $this->TrueFalse('show_in_rest', '0'); ?>
-                  <span class="cptui-field-description">(default: false) Whether to show this taxonomy data in the WP REST API.</span>
+                  <span class="bbwpcf-field-description">(default: false) Whether to show this taxonomy data in the WP REST API.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="rest_base">REST API base slug</label></th>
                 <td>
                   <?php $selected_value = ''; if(isset($edit_taxonomy_values['rewrite_slug'])){ $selected_value = $edit_taxonomy_values['rewrite_slug']; } ?>
-                  <input type="text" id="rest_base" name="cpt_custom_tax[rest_base]" value="<?php echo $selected_value; ?>" aria-required="false"><br>
-                  <span class="cptui-field-description">Slug to use in REST API URLs.</span>
+                  <input type="text" id="rest_base" name="cpt_custom_tax[rest_base]" value="<?php echo esc_attr($selected_value); ?>" aria-required="false"><br>
+                  <span class="bbwpcf-field-description">Slug to use in REST API URLs.</span>
                 </td>
               </tr>
               <tr valign="top">
                 <th scope="row"><label for="show_in_quick_edit">Show in quick/bulk edit panel.</label></th>
                 <td>
                   <?php $this->TrueFalse('show_in_quick_edit', '1'); ?>
-                  <span class="cptui-field-description">(default: true) Whether to show the taxonomy in the quick/bulk edit panel.</span></td>
+                  <span class="bbwpcf-field-description">(default: true) Whether to show the taxonomy in the quick/bulk edit panel.</span></td>
               </tr>
             </table>
           </div>
@@ -302,8 +307,8 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
               <tr valign="top">
                 <th scope="row"><label for="description">Description</label></th>
                 <td>
-                  <textarea id="description" name="user_created_taxonomy[description]" rows="4" cols="40"><?php $this->selectedText('description'); ?></textarea><br>
-                  <span class="cptui-field-description">Describe what your taxonomy is used for.</span>
+                  <textarea id="description" name="user_created_taxonomy[description]" rows="4" cols="40"><?php $this->selectedText('description', '', false); ?></textarea><br>
+                  <span class="bbwpcf-field-description">Describe what your taxonomy is used for.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -311,7 +316,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="menu_name" name="user_created_taxonomy[menu_name]" value="<?php $this->selectedText('menu_name'); ?>" aria-required="false" placeholder="(e.g. Actors)">
                   <span class="visuallyhidden">(e.g. Actors)</span><br>
-                  <span class="cptui-field-description">Custom admin menu name for your taxonomy.</span>
+                  <span class="bbwpcf-field-description">Custom admin menu name for your taxonomy.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -319,7 +324,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="all_items" name="user_created_taxonomy[all_items]" value="<?php $this->selectedText('all_items'); ?>" aria-required="false" placeholder="(e.g. All Actors)">
                   <span class="visuallyhidden">(e.g. All Actors)</span><br>
-                  <span class="cptui-field-description">Used as tab text when showing all terms for hierarchical taxonomy while editing post.</span>
+                  <span class="bbwpcf-field-description">Used as tab text when showing all terms for hierarchical taxonomy while editing post.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -327,7 +332,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="edit_item" name="user_created_taxonomy[edit_item]" value="<?php $this->selectedText('edit_item'); ?>" aria-required="false" placeholder="(e.g. Edit Actor)">
                   <span class="visuallyhidden">(e.g. Edit Actor)</span><br>
-                  <span class="cptui-field-description">Used at the top of the term editor screen for an existing taxonomy term.</span>
+                  <span class="bbwpcf-field-description">Used at the top of the term editor screen for an existing taxonomy term.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -335,7 +340,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="view_item" name="user_created_taxonomy[view_item]" value="<?php $this->selectedText('view_item'); ?>" aria-required="false" placeholder="(e.g. View Actor)">
                   <span class="visuallyhidden">(e.g. View Actor)</span><br>
-                  <span class="cptui-field-description">Used in the admin bar when viewing editor screen for an existing taxonomy term.</span>
+                  <span class="bbwpcf-field-description">Used in the admin bar when viewing editor screen for an existing taxonomy term.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -343,7 +348,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="update_item" name="user_created_taxonomy[update_item]" value="<?php $this->selectedText('update_item'); ?>" aria-required="false" placeholder="(e.g. Update Actor Name)">
                   <span class="visuallyhidden">(e.g. Update Actor Name)</span><br>
-                  <span class="cptui-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
+                  <span class="bbwpcf-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -351,7 +356,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="add_new_item" name="user_created_taxonomy[add_new_item]" value="<?php $this->selectedText('add_new_item'); ?>" aria-required="false" placeholder="(e.g. Add New Actor)">
                   <span class="visuallyhidden">(e.g. Add New Actor)</span><br>
-                  <span class="cptui-field-description">Used at the top of the term editor screen and button text for a new taxonomy term.</span>
+                  <span class="bbwpcf-field-description">Used at the top of the term editor screen and button text for a new taxonomy term.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -359,7 +364,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="new_item_name" name="user_created_taxonomy[new_item_name]" value="<?php $this->selectedText('new_item_name'); ?>" aria-required="false" placeholder="(e.g. New Actor Name)">
                   <span class="visuallyhidden">(e.g. New Actor Name)</span><br>
-                  <span class="cptui-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
+                  <span class="bbwpcf-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -367,7 +372,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="parent_item" name="user_created_taxonomy[parent_item]" value="<?php $this->selectedText('parent_item'); ?>" aria-required="false" placeholder="(e.g. Parent Actor)">
                   <span class="visuallyhidden">(e.g. Parent Actor)</span><br>
-                  <span class="cptui-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
+                  <span class="bbwpcf-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -375,7 +380,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="parent_item_colon" name="user_created_taxonomy[parent_item_colon]" value="<?php $this->selectedText('parent_item_colon'); ?>" aria-required="false" placeholder="(e.g. Parent Actor:)">
                   <span class="visuallyhidden">(e.g. Parent Actor:)</span><br>
-                  <span class="cptui-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
+                  <span class="bbwpcf-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -383,7 +388,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="search_items" name="user_created_taxonomy[search_items]" value="<?php $this->selectedText('search_items'); ?>" aria-required="false" placeholder="(e.g. Search Actors)">
                   <span class="visuallyhidden">(e.g. Search Actors)</span><br>
-                  <span class="cptui-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
+                  <span class="bbwpcf-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -391,7 +396,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="popular_items" name="user_created_taxonomy[popular_items]" value="<?php $this->selectedText('popular_items'); ?>" aria-required="false" placeholder="(e.g. Popular Actors)">
                   <span class="visuallyhidden">(e.g. Popular Actors)</span><br>
-                  <span class="cptui-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
+                  <span class="bbwpcf-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -399,7 +404,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="separate_items_with_commas" name="user_created_taxonomy[separate_items_with_commas]" value="<?php $this->selectedText('separate_items_with_commas'); ?>" aria-required="false" placeholder="(e.g. Separate Actors with commas)">
                   <span class="visuallyhidden">(e.g. Separate Actors with commas)</span><br>
-                  <span class="cptui-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
+                  <span class="bbwpcf-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -407,7 +412,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="add_or_remove_items" name="user_created_taxonomy[add_or_remove_items]" value="<?php $this->selectedText('add_or_remove_items'); ?>" aria-required="false" placeholder="(e.g. Add or remove Actors)">
                   <span class="visuallyhidden">(e.g. Add or remove Actors)</span><br>
-                  <span class="cptui-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
+                  <span class="bbwpcf-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -415,7 +420,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="choose_from_most_used" name="user_created_taxonomy[choose_from_most_used]" value="<?php $this->selectedText('choose_from_most_used'); ?>" aria-required="false" placeholder="(e.g. Choose from the most used Actors)">
                   <span class="visuallyhidden">(e.g. Choose from the most used Actors)</span><br>
-                  <span class="cptui-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
+                  <span class="bbwpcf-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -423,7 +428,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="not_found" name="user_created_taxonomy[not_found]" value="<?php $this->selectedText('not_found'); ?>" aria-required="false" placeholder="(e.g. No Actors found)">
                   <span class="visuallyhidden">(e.g. No Actors found)</span><br>
-                  <span class="cptui-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
+                  <span class="bbwpcf-field-description">Custom taxonomy label. Used in the admin menu for displaying taxonomies.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -431,7 +436,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="no_terms" name="user_created_taxonomy[no_terms]" value="<?php $this->selectedText('no_terms'); ?>" aria-required="false" placeholder="(e.g. No actors)">
                   <span class="visuallyhidden">(e.g. No actors)</span><br>
-                  <span class="cptui-field-description">Used when indicating that there are no terms in the given taxonomy associated with an object.</span>
+                  <span class="bbwpcf-field-description">Used when indicating that there are no terms in the given taxonomy associated with an object.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -439,7 +444,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="items_list_navigation" name="user_created_taxonomy[items_list_navigation]" value="<?php $this->selectedText('items_list_navigation'); ?>" aria-required="false" placeholder="(e.g. Actors list navigation)">
                   <span class="visuallyhidden">(e.g. Actors list navigation)</span><br>
-                  <span class="cptui-field-description">Screen reader text for the pagination heading on the term listing screen.</span>
+                  <span class="bbwpcf-field-description">Screen reader text for the pagination heading on the term listing screen.</span>
                 </td>
               </tr>
               <tr valign="top">
@@ -447,7 +452,7 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
                 <td>
                   <input type="text" id="items_list" name="user_created_taxonomy[items_list]" value="<?php $this->selectedText('items_list'); ?>" aria-required="false" placeholder="(e.g. Actors list)">
                   <span class="visuallyhidden">(e.g. Actors list)</span><br>
-                  <span class="cptui-field-description">Screen reader text for the items list heading on the term listing screen.</span>
+                  <span class="bbwpcf-field-description">Screen reader text for the items list heading on the term listing screen.</span>
                 </td>
               </tr>
               </table>
@@ -494,10 +499,12 @@ class BBWP_CF_CT_Page extends BBWP_CustomFields{
 
                 if($_POST['bbwpcf_posts'] && is_array($_POST['bbwpcf_posts']) && count($_POST['bbwpcf_posts']) >= 1)
                   $new_values['bbwpcf_posts'] = $_POST['bbwpcf_posts'];
-
               }
+							elseif($key == 'description'){
+								$new_values[$key] = BBWPSanitization::Textarea($value);
+							}
               else{
-                if($value == 0)
+                if($value === '0')
                   $new_values[$key] = $value;
                 else
                   $new_values[$key] = BBWPSanitization::Textfield($value);

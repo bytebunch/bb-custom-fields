@@ -1,4 +1,8 @@
 <?php
+// exit if file is called directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 class BBWPFieldTypes{
 
@@ -31,28 +35,28 @@ class BBWPFieldTypes{
       $existing_values = SerializeStringToArray(get_option($this->prefix));
       if($existing_values && is_array($existing_values) && array_key_exists($edit_field, $existing_values)){
         $input_values = $existing_values[$edit_field];
-        echo '<input type="hidden" name="update_field" value="'.$edit_field.'">';
+        echo '<input type="hidden" name="update_field" value="'.esc_attr($edit_field).'">';
       }else{
-        update_option("bbwp_update_message", "Meta Key has been updated or doesn't exist.");
+        update_option("bbwp_update_message", __("Meta Key has been updated or doesn't exist.", 'bbwp-custom-fields'));
         echo '<script>window.location.replace("'.admin_url('admin.php?page='.$_GET['page']).'");</script>';
       }
     }else
       echo '<input type="hidden" name="update_field" value="new">';
     ?>
-    <input type="hidden" name="bb_field_types_save" value="<?php echo $this->prefix("bb_field_types_save"); ?>">
+    <input type="hidden" name="bb_field_types_save" value="<?php echo esc_attr($this->prefix("bb_field_types_save")); ?>">
     <div style="float:left;" class="form-wrap" id="col-left">
       <div class="form-field">
-        <label for="field_title">Field Title <span class="require_star">*</span></label>
+        <label for="field_title"><?php _e('Field Title', 'bbwp-custom-fields'); ?> <span class="require_star">*</span></label>
         <?php $selected_value = ""; if(isset($input_values['field_title'])){ $selected_value = $input_values['field_title']; } ?>
-        <input type="text" name="field_title" id="field_title" class="regular-text" value="<?php echo $selected_value; ?>" required="required">
+        <input type="text" name="field_title" id="field_title" class="regular-text" value="<?php echo esc_attr($selected_value); ?>" required="required">
       </div>
       <div class="form-field">
-        <label for="meta_key">Meta Key <span class="require_star">*</span></label>
+        <label for="meta_key"><?php _e('Meta Key', 'bbwp-custom-fields'); ?> <span class="require_star">*</span></label>
         <?php $selected_value = ""; if(isset($input_values['meta_key'])){ $selected_value = $input_values['meta_key']; } ?>
-        <input type="text" name="meta_key" id="meta_key" class="regular-text" value="<?php echo $selected_value; ?>" required="required">
+        <input type="text" name="meta_key" id="meta_key" class="regular-text" value="<?php echo esc_attr($selected_value); ?>" required="required">
       </div>
       <div class="form-field">
-        <label for="field_type">Field Type <span class="require_star">*</span></label>
+        <label for="field_type"><?php _e('Field Type', 'bbwp-custom-fields'); ?> <span class="require_star">*</span></label>
         <select name="field_type" id="field_type" class="<?php echo $this->prefix("field_type"); ?>" required="required">
           <?php
           $selected_value = ""; if(isset($input_values['field_type'])){ $selected_value = $input_values['field_type']; }
@@ -76,32 +80,44 @@ class BBWPFieldTypes{
         </select>
       </div>
       <div class="form-field">
-        <label for="field_description">Help Text</label>
+        <label for="field_description"><?php _e('Help Text', 'bbwp-custom-fields'); ?></label>
         <?php $selected_value = ""; if(isset($input_values['field_description'])){ $selected_value = $input_values['field_description']; } ?>
         <textarea name="field_description" id="field_description" cols="30" rows="5" class="regular-text"><?php echo $selected_value; ?></textarea>
-        <p class="description">Tell to the user about what is the field</p>
+        <p class="description"><?php _e('Tell to the user about what is the field', 'bbwp-custom-fields'); ?></p>
       </div>
-      <p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="Save Changes"></p>
+      <p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="<?php _e('Save Changes', 'bbwp-custom-fields'); ?>"></p>
   </div> <!-- style="width:50%; float:left;"  -->
     <div class="form-wrap" id="col-right" style="float:right;">
         <div class="options_of_fields" style="padding:20px; background-color:#fff;">
-          <h3 style="margin:0 0 20px 0px;">Options of field</h3><p>By default on this box will be displayed a information about custom fields, after the custom field be selected, this box will be displayed some extra options of the field (if required) or a information about the selected field</p>
+          <h3 style="margin:0 0 20px 0px;"><?php _e('Options of field', 'bbwp-custom-fields'); ?></h3>
+					<p><?php _e('By default on this box will be displayed a information about custom fields, after the custom field be selected, this box will be displayed some extra options of the field (if required) or a information about the selected field', 'bbwp-custom-fields'); ?></p>
           <div class="hidden_fields checkbox_list select radio form-field" style="display:none;">
-            <label for="field_type_values">Choices: </label>
+            <label for="field_type_values"><?php _e('Choices', 'bbwp-custom-fields'); ?>: </label>
             <?php $selected_value = ""; if(isset($input_values['field_type_values'])){ $selected_value = implode("\n", $input_values['field_type_values']); } ?>
             <textarea name="field_type_values" id="field_type_values" cols="30" rows="5" class="regular-text"><?php echo $selected_value; ?></textarea>
-            <p class="description">Enter each choice on a new line.</p>
+            <p class="description"><?php _e('Enter each choice on a new line.', 'bbwp-custom-fields'); ?></p>
           </div>
           <div class="hidden_fields text color select radio form-field">
-            <label for="default_value">Default Value: </label>
+            <label for="default_value"><?php _e('Default Value', 'bbwp-custom-fields'); ?>: </label>
             <?php $selected_value = ""; if(isset($input_values['default_value'])){ $selected_value = $input_values['default_value']; } ?>
-            <input type="text" name="default_value" id="default_value" class="regular-text" value="<?php echo $selected_value; ?>" />
+            <input type="text" name="default_value" id="default_value" class="regular-text" value="<?php echo esc_attr($selected_value); ?>" />
           </div>
           <div class="hidden_fields text image form-field">
-            <label for="field_duplicate" style="display:inline-block;">Can be duplicated: </label>
+            <label for="field_duplicate" style="display:inline-block;"><?php _e('Can be duplicated', 'bbwp-custom-fields'); ?>: </label>
             <?php $selected_value = ""; if(isset($input_values['field_duplicate'])){ $selected_value = $input_values['field_duplicate']; } ?>
             <input type="checkbox" name="field_duplicate" id="field_duplicate" <?php if($selected_value === 'on'){ echo 'checked="checked"'; } ?> />
           </div>
+					<div class="hidden_fields textarea editor form-field">
+            <label for="field_allow_all_code" style="display:inline-block;"><?php _e('Allow all types of code', 'bbwp-custom-fields'); ?>: </label>
+            <?php $selected_value = ""; if(isset($input_values['field_allow_all_code'])){ $selected_value = $input_values['field_allow_all_code']; } ?>
+            <input type="checkbox" name="field_allow_all_code" id="field_allow_all_code" <?php if($selected_value === 'on'){ echo 'checked="checked"'; } ?> />
+          </div>
+					<div class="hidden_fields textarea editor form-field">
+            <label for="field_disable_autop" style="display:inline-block;"><?php _e('Disable wpautop', 'bbwp-custom-fields'); ?>: </label>
+            <?php $selected_value = ""; if(isset($input_values['field_disable_autop'])){ $selected_value = $input_values['field_disable_autop']; } ?>
+            <input type="checkbox" name="field_disable_autop" id="field_disable_autop" <?php if($selected_value === 'on'){ echo 'checked="checked"'; } ?> />
+          </div>
+
         </div>
     </div>
     <div class="clearboth"></div>
@@ -135,7 +151,7 @@ class BBWPFieldTypes{
         unset($existing_values[$meta_key]);
       }
       update_option($db_key, ArrayToSerializeString($existing_values));
-      update_option("bbwp_update_message", 'Your setting have been updated.');
+      update_option("bbwp_update_message", __('Your setting have been updated.', 'bbwp-custom-fields'));
     }
   }
 
@@ -152,7 +168,7 @@ class BBWPFieldTypes{
       }
       if(count($existing_values) == count($new_values)){
         update_option($db_key, ArrayToSerializeString($new_values));
-        update_option("bbwp_update_message", 'Your setting have been updated.');
+        update_option("bbwp_update_message", __('Your setting have been updated.', 'bbwp-custom-fields'));
       }
     }
   }
@@ -181,10 +197,10 @@ class BBWPFieldTypes{
 
         if($value && $key && $type){
 
-          $update_message = 'Your setting have been updated.';
+          $update_message = __('Your setting have been updated.', 'bbwp-custom-fields');
 
           if(isset($_GET["action"]) && $_GET["action"] == "edit" && isset($_GET['page']) && isset($_GET['meta_key']) && array_key_exists($key, $existing_values)){
-            $update_message = '<p>Your setting have been updated.</p>';
+            $update_message = '<p>'.__('Your setting have been updated.', 'bbwp-custom-fields').'</p>';
           }
 
 
@@ -206,10 +222,23 @@ class BBWPFieldTypes{
             if($field_description)
               $new_field_values['field_description'] = $field_description;
           }
+
           $new_field_values['field_duplicate'] = '';
           if(isset($_POST['field_duplicate'])){
             $new_field_values['field_duplicate'] = 'on';
           }
+
+					$new_field_values['field_allow_all_code'] = '';
+          if(isset($_POST['field_allow_all_code'])){
+            $new_field_values['field_allow_all_code'] = 'on';
+          }
+
+					$new_field_values['field_disable_autop'] = '';
+          if(isset($_POST['field_disable_autop'])){
+            $new_field_values['field_disable_autop'] = 'on';
+          }
+
+
 
           if(($type == "checkbox_list" || $type == "select" || $type == "radio") && isset($_POST["field_type_values"]) && $_POST["field_type_values"])
           {
@@ -280,13 +309,13 @@ class BBWPFieldTypes{
             <input type="button" class="button tagadd bb_tagadd" value="Add"><div class="bbtagchecklist input_bbtagchecklist">';
             if($selected_value && is_array($selected_value) && count($selected_value) >= 1){
               foreach ($selected_value as $field_type_value) {
-                echo '<span><input type="text" value="'.$field_type_value.'" name="'.$value['meta_key'].'[]" class="regular-text" /><a href="#" class="bb_delete_it bb_dismiss_icon">&nbsp;</a></span>';
+                echo '<span><input type="text" value="'.esc_attr($field_type_value).'" name="'.$value['meta_key'].'[]" class="regular-text" /><a href="#" class="bb_delete_it bb_dismiss_icon">&nbsp;</a></span>';
               }
             }
             echo '</div></div>';
           }
           else
-            echo '<input type="'.$value['field_type'].'" name="'.$value['meta_key'].'" id="'.$value['meta_key'].'" value="'.$selected_value.'" class="regular-text">';
+            echo '<input type="'.$value['field_type'].'" name="'.$value['meta_key'].'" id="'.$value['meta_key'].'" value="'.esc_attr($selected_value).'" class="regular-text">';
         }
         elseif($value['field_type'] == 'image'){
           if(isset($value['field_duplicate']) && $value['field_duplicate'] == 'on'){
@@ -295,12 +324,12 @@ class BBWPFieldTypes{
             echo '<div class="bb_multiple_images_preview bb_image_preview">';
             if($selected_value && is_array($selected_value) && count($selected_value) >= 1){
               foreach ($selected_value as $field_type_value) {
-                echo '<span><img src="'.$field_type_value.'"><a href="#" class="bb_dismiss_icon bb_delete_it">&nbsp;</a><input type="hidden" name="'.$value['meta_key'].'[]" value="'.$field_type_value.'" /></span>';
+                echo '<span><img src="'.$field_type_value.'"><a href="#" class="bb_dismiss_icon bb_delete_it">&nbsp;</a><input type="hidden" name="'.$value['meta_key'].'[]" value="'.esc_attr($field_type_value).'" /></span>';
               }
             }
             echo '<div class="clearboth"></div></div>';
           }else{
-            echo '<input type="text" name="'.$value['meta_key'].'" id="'.$value['meta_key'].'" value="'.$selected_value.'" class="regular-text">
+            echo '<input type="text" name="'.$value['meta_key'].'" id="'.$value['meta_key'].'" value="'.esc_attr($selected_value).'" class="regular-text">
             <input type="button" id="" class="bytebunch_file_upload_button button" value="Select Image">';
             echo '<div class="bb_single_image_preview bb_image_preview">';
             if($selected_value){
@@ -311,8 +340,8 @@ class BBWPFieldTypes{
 
         }
         elseif($value['field_type'] == 'file'){
-          echo '<input type="text" name="'.$value['meta_key'].'" id="'.$value['meta_key'].'" value="'.$selected_value.'" class="regular-text">
-              <input type="button" id="" class="bytebunch_file_upload_button button" value="Upload File">';
+          echo '<input type="text" name="'.$value['meta_key'].'" id="'.$value['meta_key'].'" value="'.esc_attr($selected_value).'" class="regular-text">
+              <input type="button" id="" class="bytebunch_file_upload_button button" value="'.__('Upload File', 'bbwp-custom-fields').'">';
         }
         elseif($value['field_type'] == 'editor'){
           $setting = array('textarea_rows' => 10, 'textarea_name' => $value['meta_key'], 'teeny' => false, 'tinymce' => true, 'quicktags' => true);
@@ -322,27 +351,27 @@ class BBWPFieldTypes{
           echo '<textarea name="'.$value['meta_key'].'" id="'.$value['meta_key'].'" rows="5">'.$selected_value.'</textarea>';
         }
         elseif($value['field_type'] == 'color'){
-          echo '<input type="text" name="'.$value['meta_key'].'" id="'.$value['meta_key'].'" value="'.$selected_value.'" class="bytebunch-wp-color-picker regular-text">';
+          echo '<input type="text" name="'.$value['meta_key'].'" id="'.$value['meta_key'].'" value="'.esc_attr($selected_value).'" class="bytebunch-wp-color-picker regular-text">';
         }
         elseif($value['field_type'] == 'date'){
-          echo '<input type="text" name="'.$value['meta_key'].'" id="'.$value['meta_key'].'" value="'.$selected_value.'" class="bytebunch-wp-date-picker regular-text">';
+          echo '<input type="text" name="'.$value['meta_key'].'" id="'.$value['meta_key'].'" value="'.esc_attr($selected_value).'" class="bytebunch-wp-date-picker regular-text">';
         }
         elseif($value['field_type'] == 'select'){
           echo '<select name="'.$value['meta_key'].'" id="'.$value['meta_key'].'">';
           foreach($value['field_type_values'] as $field_type_value){
             if($field_type_value == $selected_value)
-              echo '<option value="'.$field_type_value.'" selected="selected">'.$field_type_value.'</option>';
+              echo '<option value="'.esc_attr($field_type_value).'" selected="selected">'.esc_html($field_type_value).'</option>';
             else
-              echo '<option value="'.$field_type_value.'">'.$field_type_value.'</option>';
+              echo '<option value="'.esc_attr($field_type_value).'">'.esc_html($field_type_value).'</option>';
           }
           echo '</select>';
         }
         elseif($value['field_type'] == 'radio'){
           foreach($value['field_type_values'] as $key=>$field_type_value){
             if($field_type_value == $selected_value)
-              echo ' <input type="radio" id="'.$value['meta_key'].$key.'" value="'.$field_type_value.'" name="'.$value['meta_key'].'" checked="checked" /> <label for="'.$value['meta_key'].$key.'">'.$field_type_value.'</label> ';
+              echo ' <input type="radio" id="'.$value['meta_key'].$key.'" value="'.esc_attr($field_type_value).'" name="'.$value['meta_key'].'" checked="checked" /> <label for="'.$value['meta_key'].$key.'">'.esc_html($field_type_value).'</label> ';
             else
-              echo ' <input type="radio" id="'.$value['meta_key'].$key.'" value="'.$field_type_value.'" name="'.$value['meta_key'].'" /> <label for="'.$value['meta_key'].$key.'">'.$field_type_value.'</label> ';
+              echo ' <input type="radio" id="'.$value['meta_key'].$key.'" value="'.esc_attr($field_type_value).'" name="'.$value['meta_key'].'" /> <label for="'.$value['meta_key'].$key.'">'.esc_html($field_type_value).'</label> ';
             echo '&nbsp;&nbsp;';
           }
         }
@@ -358,9 +387,9 @@ class BBWPFieldTypes{
             $selected_value = array();
           foreach($value['field_type_values'] as $key=>$field_type_value){
             if(in_array($field_type_value, $selected_value))
-              echo ' <input type="checkbox" id="'.$value['meta_key'].$key.'" value="'.$field_type_value.'" name="'.$value['meta_key'].'[]" checked="checked" /> <label for="'.$value['meta_key'].$key.'">'.$field_type_value.'</label> ';
+              echo ' <input type="checkbox" id="'.$value['meta_key'].$key.'" value="'.esc_attr($field_type_value).'" name="'.$value['meta_key'].'[]" checked="checked" /> <label for="'.$value['meta_key'].$key.'">'.esc_html($field_type_value).'</label> ';
             else
-              echo ' <input type="checkbox" id="'.$value['meta_key'].$key.'" value="'.$field_type_value.'" name="'.$value['meta_key'].'[]" /> <label for="'.$value['meta_key'].$key.'">'.$field_type_value.'</label> ';
+              echo ' <input type="checkbox" id="'.$value['meta_key'].$key.'" value="'.esc_attr($field_type_value).'" name="'.$value['meta_key'].'[]" /> <label for="'.$value['meta_key'].$key.'">'.esc_html($field_type_value).'</label> ';
             echo '&nbsp;&nbsp;';
           }
         }
@@ -392,7 +421,19 @@ class BBWPFieldTypes{
             }
             else{
                 if($value['field_type'] == 'textarea' || $value['field_type'] == 'editor'){
-                  $dbvalue = wptexturize(wpautop(BBWPSanitization::Textarea($_POST[$value['meta_key']]))); }
+									if(isset($value['field_allow_all_code']) && $value['field_allow_all_code'] && $value['field_allow_all_code'] == 'on'){
+										if(isset($value['field_disable_autop']) && $value['field_disable_autop'] && $value['field_disable_autop'] == 'on')
+											$dbvalue = wptexturize(BBWPSanitization::Textarea($_POST[$value['meta_key']], true));
+										else
+											$dbvalue = wptexturize(wpautop(BBWPSanitization::Textarea($_POST[$value['meta_key']], true)));
+									}else{
+										if(isset($value['field_disable_autop']) && $value['field_disable_autop'] && $value['field_disable_autop'] == 'on')
+											$dbvalue = wptexturize(BBWPSanitization::Textarea($_POST[$value['meta_key']]));
+										else
+											$dbvalue = wptexturize(wpautop(BBWPSanitization::Textarea($_POST[$value['meta_key']])));
+									}
+
+								}
                 else{
                   $dbvalue = BBWPSanitization::Textfield($_POST[$value['meta_key']]); }
             }
@@ -418,7 +459,7 @@ class BBWPFieldTypes{
         }
 
         if($this->saveType == "option")
-          update_option("bbwp_update_message", 'Your setting have been updated.');
+          update_option("bbwp_update_message", __('Your setting have been updated.', 'bbwp-custom-fields'));
       }
     }
   }

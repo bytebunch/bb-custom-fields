@@ -1,4 +1,9 @@
 <?php
+// exit if file is called directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class BBWP_CF_CustomPostType
 {
   private $post_type_names;
@@ -101,7 +106,7 @@ class BBWP_CF_CustomPostType
           if(isset($postType['bbwpcf_pt_taxonomies']) && is_array($postType['bbwpcf_pt_taxonomies']) && count($postType['bbwpcf_pt_taxonomies']) >= 1){
               $post_type_args['taxonomies'] = $postType['bbwpcf_pt_taxonomies'];
           }
-          
+
           $args = array_merge(
               // Default
               array(

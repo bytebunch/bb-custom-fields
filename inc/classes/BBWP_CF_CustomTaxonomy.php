@@ -1,4 +1,9 @@
 <?php
+// exit if file is called directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class BBWP_CF_CustomTaxonomy
 {
   private $taxonomy_names;

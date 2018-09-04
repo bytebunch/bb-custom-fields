@@ -1,4 +1,9 @@
 <?php
+// exit if file is called directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class BBWP_CF_CreateMetaBoxes extends BBWP_CustomFields{
 
   private $user_created_pages = array();

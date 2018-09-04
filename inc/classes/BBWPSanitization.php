@@ -1,4 +1,9 @@
 <?php
+// exit if file is called directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 class BBWPSanitization{
 
   /******************************************/
@@ -70,6 +75,9 @@ class BBWPSanitization{
         global $allowedposttags;
         $text = stripslashes(trim(wp_kses( $text, $allowedposttags)));
       }
+			elseif ($bballowedtags === true) {
+				$text = stripslashes(trim($text));
+			}
       else
         $text = stripslashes(trim(wp_kses( $text, $bballowedtags)));
       if(strlen($text) >= 1){
