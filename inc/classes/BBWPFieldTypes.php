@@ -61,7 +61,8 @@ class BBWPFieldTypes{
           <?php
           $selected_value = ""; if(isset($input_values['field_type'])){ $selected_value = $input_values['field_type']; }
           $types = array(
-            'text' => 'Text',
+						'text' => 'Text',
+						'number' => 'Number',
             'editor' => 'Editor',
             'image' => 'Image',
             'file' => 'Files',
@@ -72,7 +73,8 @@ class BBWPFieldTypes{
             'checkbox' => 'Check Box',
             'select' => 'Select List',
             'password' => 'Password',
-            'radio' => 'Radio Buttons',
+						'radio' => 'Radio Buttons',
+						'hidden' => 'Hidden'
           );
           echo ArraytoSelectList($types, $selected_value);
           ?>
@@ -86,32 +88,103 @@ class BBWPFieldTypes{
         <p class="description"><?php _e('Tell to the user about what is the field', 'bbwp-custom-fields'); ?></p>
       </div>
       <p class="submit"><input type="submit" name="submit" id="submit" class="button button-primary" value="<?php _e('Save Changes', 'bbwp-custom-fields'); ?>"></p>
-  </div> <!-- style="width:50%; float:left;"  -->
+  	</div> <!-- style="width:50%; float:left;"  -->
     <div class="form-wrap" id="col-right" style="float:right;">
         <div class="options_of_fields" style="padding:20px; background-color:#fff;">
           <h3 style="margin:0 0 20px 0px;"><?php _e('Options of field', 'bbwp-custom-fields'); ?></h3>
 					<p><?php _e('By default on this box will be displayed a information about custom fields, after the custom field be selected, this box will be displayed some extra options of the field (if required) or a information about the selected field', 'bbwp-custom-fields'); ?></p>
-          <div class="hidden_fields checkbox_list select radio form-field" style="display:none;">
-            <label for="field_type_values"><?php _e('Choices', 'bbwp-custom-fields'); ?>: </label>
-            <?php $selected_value = ""; if(isset($input_values['field_type_values'])){ $selected_value = implode("\n", $input_values['field_type_values']); } ?>
-            <textarea name="field_type_values" id="field_type_values" cols="30" rows="5" class="regular-text"><?php echo $selected_value; ?></textarea>
-            <p class="description"><?php _e('Enter each choice on a new line.', 'bbwp-custom-fields'); ?></p>
+          
+					<!-- Custom Post types -->
+					<div class="hidden_fields select form-field" style="display:none;">
+						<?php 
+						$selected_value = 'field_is_custom_select_list';
+            	if(isset($input_values['field_select_list_type']) && $input_values['field_select_list_type']){
+              	$selected_value = $input_values['field_select_list_type'];
+            }
+						$field_is_custom_select_list = array(
+							array('id' => 'field_is_custom_select_list', 'value' => 'field_is_custom_select_list', 'label' => __('Custom List', 'bbwp-custom-fields')), 
+							array('id' => 'field_is_post_types', 'value' => 'field_is_post_types', 'label' => __('Post Types', 'bbwp-custom-fields')),
+							array('id' => 'field_is_taxonomies', 'value' => 'field_is_taxonomies', 'label' => __('Taxonomies', 'bbwp-custom-fields'))
+						);
+						echo '<div class="bb_checkboxes_container">';
+						echo ArraytoRadioList($field_is_custom_select_list, 'field_select_list_type', $selected_value);
+						echo '</div>';
+						?>
           </div>
-          <div class="hidden_fields text color select radio form-field">
+					
+					<!-- Choices -->
+					<div class="hidden_fields checkbox_list select radio form-field" style="display:none;">
+						<div class="d-none field_select_list_type field_is_custom_select_list">
+							<label for="field_type_values"><?php _e('Choices', 'bbwp-custom-fields'); ?>: </label>
+							<?php $selected_value = ""; if(isset($input_values['field_type_values'])){ $selected_value = implode("\n", $input_values['field_type_values']); } ?>
+							<textarea name="field_type_values" id="field_type_values" cols="30" rows="5" class="regular-text"><?php echo $selected_value; ?></textarea>
+							<p class="description"><?php _e('Enter each choice on a new line.', 'bbwp-custom-fields'); ?></p>
+						</div>
+						<div class="d-none field_select_list_type field_is_post_types">
+						<?php	
+						$post_types_list = array();
+						$selected_value = array();
+            if(isset($input_values['field_post_types']) && is_array($input_values['field_post_types'])){
+              $selected_value = $input_values['field_post_types'];
+            }
+						
+						$args = array('public' => true);
+            $post_types = get_post_types( $args, 'names' );
+            foreach ( $post_types as $post_type ) {
+              if($post_type == 'attachment')
+                continue;
+							$post_types_list[$post_type] = array('id' => $post_type, 'value' => $post_type, 'label' => ucfirst(str_ireplace(array("-","_"), array(" ", " "), $post_type)));
+            }
+						
+						echo '<div class="bb_checkboxes_container">';
+						echo ArraytoCheckBoxList($post_types_list, 'field_post_types', $selected_value);
+						echo '</div>';
+						?>
+						</div>
+						<div class="d-none field_select_list_type field_is_taxonomies">
+						<?php	
+						$taxonomies_list = array();
+						$selected_value = array();
+            if(isset($input_values['field_taxonomies']) && is_array($input_values['field_taxonomies'])){
+              $selected_value = $input_values['field_taxonomies'];
+            }
+						
+            $taxonomies = get_taxonomies($args);
+            foreach ( $taxonomies as $taxonomy ) {
+              if($taxonomy == 'post_format')
+                continue;
+							$taxonomies_list[$taxonomy] = array('id' => $taxonomy, 'value' => $taxonomy, 'label' => ucfirst(str_ireplace(array("-","_"), array(" ", " "), $taxonomy)));
+            }
+						
+						echo '<div class="bb_checkboxes_container">';
+						echo ArraytoCheckBoxList($taxonomies_list, 'field_taxonomies', $selected_value);
+						echo '</div>';
+						?>
+						</div>
+          </div><!-- hidden_fields-->
+					
+					<!-- Default Value -->
+          <div class="hidden_fields text color select radio form-field number hidden">
             <label for="default_value"><?php _e('Default Value', 'bbwp-custom-fields'); ?>: </label>
             <?php $selected_value = ""; if(isset($input_values['default_value'])){ $selected_value = $input_values['default_value']; } ?>
             <input type="text" name="default_value" id="default_value" class="regular-text" value="<?php echo esc_attr($selected_value); ?>" />
           </div>
+					
+					<!-- Can be duplicated -->
           <div class="hidden_fields text image form-field">
             <label for="field_duplicate" style="display:inline-block;"><?php _e('Can be duplicated', 'bbwp-custom-fields'); ?>: </label>
             <?php $selected_value = ""; if(isset($input_values['field_duplicate'])){ $selected_value = $input_values['field_duplicate']; } ?>
             <input type="checkbox" name="field_duplicate" id="field_duplicate" <?php if($selected_value === 'on'){ echo 'checked="checked"'; } ?> />
           </div>
+					
+					
 					<div class="hidden_fields textarea editor form-field">
             <label for="field_allow_all_code" style="display:inline-block;"><?php _e('Allow all types of code', 'bbwp-custom-fields'); ?>: </label>
             <?php $selected_value = ""; if(isset($input_values['field_allow_all_code'])){ $selected_value = $input_values['field_allow_all_code']; } ?>
             <input type="checkbox" name="field_allow_all_code" id="field_allow_all_code" <?php if($selected_value === 'on'){ echo 'checked="checked"'; } ?> />
           </div>
+					
+					<!-- Disable wpautop -->
 					<div class="hidden_fields textarea editor form-field">
             <label for="field_disable_autop" style="display:inline-block;"><?php _e('Disable wpautop', 'bbwp-custom-fields'); ?>: </label>
             <?php $selected_value = ""; if(isset($input_values['field_disable_autop'])){ $selected_value = $input_values['field_disable_autop']; } ?>
@@ -274,15 +347,19 @@ class BBWPFieldTypes{
       echo $this->displaytype['wrapper_open'];
 
       foreach($existing_values as $value){
-        echo $this->displaytype['container_open'];
+
+				if($value['field_type'] != 'hidden')
+        	echo $this->displaytype['container_open'];
 
         $field_description = '';
         if(isset($value['field_description']))
           $field_description = '<p class="description">'.$value['field_description'].'</p>';
 
-        echo $this->displaytype['label_open'].'<label for="'.$value['meta_key'].'">'.$value['field_title'].'</label>'.$field_description.$this->displaytype['label_close'].$this->displaytype['input_open'];
+				if($value['field_type'] != 'hidden')
+        	echo $this->displaytype['label_open'].'<label for="'.$value['meta_key'].'">'.$value['field_title'].'</label>'.$field_description.$this->displaytype['label_close'].$this->displaytype['input_open'];
 
-        $default_value = "";
+				$default_value = "";
+				$selected_value = "";
         if(isset($value['default_value']) && $value['default_value'])
           $default_value = $value['default_value'];
 
@@ -303,7 +380,7 @@ class BBWPFieldTypes{
           $selected_value = SerializeStringToArray($selected_value);
         }
 
-        if($value['field_type'] == 'text' || $value['field_type'] == 'password' ){
+        if($value['field_type'] == 'text' || $value['field_type'] == 'password' || $value['field_type'] == 'number' || $value['field_type'] == 'hidden'){
           if(isset($value['field_duplicate']) && $value['field_duplicate'] == 'on'){
             echo '<div><input type="text" class="field_duplicate regular-text bb_new_tag" data-name="'.$value['meta_key'].'" />
             <input type="button" class="button tagadd bb_tagadd" value="Add"><div class="bbtagchecklist input_bbtagchecklist">';
@@ -316,7 +393,7 @@ class BBWPFieldTypes{
           }
           else
             echo '<input type="'.$value['field_type'].'" name="'.$value['meta_key'].'" id="'.$value['meta_key'].'" value="'.esc_attr($selected_value).'" class="regular-text">';
-        }
+				}
         elseif($value['field_type'] == 'image'){
           if(isset($value['field_duplicate']) && $value['field_duplicate'] == 'on'){
             //<p class="description">You can use Ctrl+Click to select multiple images from media library.</p>
@@ -392,9 +469,11 @@ class BBWPFieldTypes{
               echo ' <input type="checkbox" id="'.$value['meta_key'].$key.'" value="'.esc_attr($field_type_value).'" name="'.$value['meta_key'].'[]" /> <label for="'.$value['meta_key'].$key.'">'.esc_html($field_type_value).'</label> ';
             echo '&nbsp;&nbsp;';
           }
-        }
-        echo $this->displaytype['input_close'];
-        echo $this->displaytype['container_close'];
+				}
+				if($value['field_type'] != 'hidden'){
+					echo $this->displaytype['input_close'];
+					echo $this->displaytype['container_close'];
+				}
       }
       echo $this->displaytype['wrapper_close'];
     }

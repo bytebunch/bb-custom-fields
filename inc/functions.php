@@ -55,6 +55,50 @@ if(!function_exists("ArraytoSelectList")){
 	}
 }
 
+/******************************************/
+/***** ArraytoSelectList **********/
+/******************************************/
+if(!function_exists("ArraytoRadioList")){
+  function ArraytoRadioList($array, $name = "", $sValue = ""){
+    $output = '';
+		
+    foreach($array as $key=>$value){
+    	$checked = '';
+			if($sValue && $value['value'] == $sValue)
+				$checked = 'checked="checked"';
+		
+			$output .= '<input type="radio" value="'.$value['value'].'" id="'.$value['id'].'" name="'.$name.'" '.$checked.' />';
+			$output .= '<label for="'.$value['id'].'">'.$value['label'].' </label>';
+			$output .= ' &nbsp;&nbsp;';
+			
+    }
+    return $output;
+	}
+}
+
+
+/******************************************/
+/***** ArraytoSelectList **********/
+/******************************************/
+if(!function_exists("ArraytoCheckBoxList")){
+  function ArraytoCheckBoxList($array, $name = "", $sValue = array()){
+    $output = '';
+		$i = 1;
+    foreach($array as $key=>$value){
+    	$checked = '';
+			if($sValue && is_array($sValue) && in_array($value['value'], $sValue))
+				$checked = 'checked="checked"';
+		
+			$output .= '<input type="checkbox" value="'.$value['value'].'" id="'.$value['id'].$i.'" name="'.$name.'[]" '.$checked.' />';
+			$output .= '<label for="'.$value['id'].$i.'">'.$value['label'].' </label>';
+			$output .= ' &nbsp;&nbsp;';
+			$i++;
+			
+    }
+    return $output;
+	}
+}
+
 
 /******************************************/
 /***** arrayToSerializeString **********/

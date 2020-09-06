@@ -107,7 +107,7 @@ class BBWP_CF_CreateMetaBoxes extends BBWP_CustomFields{
             add_management_page($page['page_title'], $page['page_title'], 'manage_options',$page['page_slug'], array($this,'user_created_menu_pages'));
           elseif($page['parent_menu'] == 'options')
             add_options_page($page['page_title'], $page['page_title'], 'manage_options',$page['page_slug'], array($this,'user_created_menu_pages'));
-          elseif(array_key_exists($page['parent_menu'], $user_pages))
+          elseif(array_key_exists($page['parent_menu'], $this->user_created_pages))
             add_submenu_page( $page['parent_menu'], $page['page_title'], $page['page_title'], 'manage_options', $page['page_slug'], array($this,'user_created_menu_pages'));
         }
       }

@@ -62,6 +62,19 @@ jQuery(document).ready(function($){
 		 divclass: "bbwp_tab_nav_content",
 		 active_link_class:"nav-tab-active"
 	 });
+	
+	if($('input[name="field_select_list_type"]:checked').length >= 1){
+		var field_select_list_type_id = $('input[name="field_select_list_type"]:checked').attr('id');
+		$(".field_select_list_type").hide();
+		$(".field_select_list_type."+field_select_list_type_id).show();
+	}
+	
+	$("input[name='field_select_list_type']").change(function(){
+		var field_select_list_type_id = $('input[name="field_select_list_type"]:checked').attr('id');
+		$(".field_select_list_type").hide();
+		$(".field_select_list_type."+field_select_list_type_id).show();
+	});
+	
 });
 
 
@@ -78,7 +91,9 @@ jQuery(document).ready(function($) {
 
 	// jquery for field types class start from here
 	$( '.bytebunch-wp-color-picker' ).wpColorPicker();
-	$( '.bytebunch-wp-date-picker' ).datepicker();
+	$( '.bytebunch-wp-date-picker' ).datepicker({
+		changeYear: true
+	});
 	$( '.bytebunch-wp-sortable' ).sortable({
       placeholder: "ui-state-highlight"
     });
@@ -94,13 +109,13 @@ jQuery(document).ready(function($) {
 		return false;
 	});
 
-	$(".bb_single_image_preview a").live("click", function(){
+	$("body").on("click", ".bb_single_image_preview a", function(){
 		$(this).parents(".bb_single_image_preview").parent().find("input[type='text']").val("");
 		$(this).parent().remove();
 		return false;
 	});
 
-	$(".bb_delete_it").live("click", function(){
+	$("body").on("click", ".bb_delete_it", function(){
 		$(this).parent().remove();
 		return false;
 	});

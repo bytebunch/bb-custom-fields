@@ -4,10 +4,10 @@ Plugin Name: BBWP Custom Fields
 Plugin URI: https://wordpress.org/plugins/bbwp-custom-fields/
 Description: Allows you to add additional Meta Boxes with custom fields into Post types, Taxonomies, User Profile, Comments and more.
 Author: ByteBunch
-Version: 1.1
-Stable tag:        1.1
+Version: 1.3
+Stable tag:        1.3
 Requires at least: 4.5
-Tested up to: 4.9.8
+Tested up to: 5.5.1
 Author URI: https://bytebunch.com
 Text Domain:       bbwp-custom-fields
 Domain Path:       /languages
